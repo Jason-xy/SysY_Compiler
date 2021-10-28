@@ -1,0 +1,18 @@
+﻿将TDM-GCC-32.rar 解压缩到 D:\compiler目录
+
+开始==> 运行　==> 输入　cmd 回车　
+
+在命令行里执行　set path=$path;D:\compiler\TDM-GCC-32\bin  回车
+
+验证是否已经加入：flex --version 回车
+
+
+ 实现步骤：
+
+1.运行CMD
+
+2.输入命令：
+chcp 65001
+
+3.修改CMD窗口的属性：
+在标题栏右键->Properties->Font 栏->字体选择“Lucida Console”->确定->“只应用到当前窗口”

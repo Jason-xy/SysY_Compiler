@@ -1,0 +1,91 @@
+
+    1 program: external_declaration
+    2        | program external_declaration
+
+    3 external_declaration: function_definition
+    4                     | declaration
+
+    5 function_definition: type declarator compound_statement
+
+    6 declaration: type init_declarator_list ';'
+
+    7 init_declarator_list: init_declarator
+    8                     | init_declarator_list ',' init_declarator
+
+    9 init_declarator: declarator
+   10                | declarator '=' initializer
+
+   11 initializer: NUMBER
+   12            | STRING
+
+   13 declarator: direct_declarator
+
+   14 direct_declarator: ID
+   15                  | direct_declarator '(' parameter_list ')'
+   16                  | direct_declarator '(' ')'
+
+   17 parameter_list: parameter
+   18               | parameter_list ',' parameter
+
+   19 parameter: type ID
+
+   20 type: INT
+   21     | STR
+   22     | VOID
+
+   23 statement: compound_statement
+   24          | expression_statement
+   25          | selection_statement
+   26          | iteration_statement
+   27          | jump_statement
+
+   28 compound_statement: begin_scope end_scope
+   29                   | begin_scope statement_list end_scope
+   30                   | begin_scope declaration_list end_scope
+   31                   | begin_scope declaration_list statement_list end_scope
+
+   32 begin_scope: '{'
+
+   33 end_scope: '}'
+
+   34 declaration_list: declaration
+   35                 | declaration_list declaration
+
+   36 statement_list: statement
+   37               | statement_list statement
+
+   38 expression_statement: ';'
+   39                     | expr ';'
+
+   40 selection_statement: IF '(' expr ')' statement
+   41                    | IF '(' expr ')' statement ELSE statement
+
+   42 iteration_statement: WHILE '(' expr ')' statement
+
+   43 jump_statement: RETURN ';'
+   44               | RETURN expr ';'
+
+   45 expr: assign_expr
+   46     | expr CMP add_expr
+
+   47 assign_expr: add_expr
+   48            | ID ASSIGN assign_expr
+   49            | ID '=' assign_expr
+
+   50 add_expr: mul_expr
+   51         | add_expr '+' mul_expr
+   52         | add_expr '-' mul_expr
+
+   53 mul_expr: primary_expr
+   54         | mul_expr '*' primary_expr
+   55         | mul_expr '/' primary_expr
+
+   56 primary_expr: ID '(' expr_list ')'
+   57             | ID '(' ')'
+   58             | '(' expr ')'
+   59             | ID
+   60             | initializer
+
+   61 expr_list: expr
+   62          | expr_list ',' expr
+

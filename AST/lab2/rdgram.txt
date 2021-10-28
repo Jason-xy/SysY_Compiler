@@ -1,0 +1,130 @@
+
+%%
+program
+    : external_declaration
+    | program external_declaration
+    ;
+
+external_declaration
+    : type declarator decl_or_stmt
+    ;
+
+decl_or_stmt
+    : '{' statement_list '}'
+    | '{' '}'
+    | ',' declarator_list ';'
+    | ';'
+    ;
+
+declarator_list
+    : declarator
+    | declarator_list ',' declarator
+    ;
+
+intstr_list
+    : initializer
+    | intstr_list ',' initializer
+    ;
+    
+initializer
+    : NUMBER
+    | STRING
+    ;
+   
+declarator
+    : ID
+    | ID '=' expr
+    | ID '(' parameter_list ')'
+    | ID '(' ')'
+    | ID '[' expr ']'
+    | ID '[' ']'
+    | ID '[' expr ']' '=' '{' intstr_list '}'
+    | ID '[' ']' '=' '{' intstr_list '}'
+    ;
+
+parameter_list
+        : parameter
+        | parameter_list ',' parameter
+        ;
+
+
+parameter
+        : type ID
+        ;
+type
+        : INT
+        | STR
+        | VOID
+        ;
+
+statement
+    : type declarator_list ';'
+    | '{' statement_list '}'
+    | expr_statement
+    | IF '(' expr ')' statement
+    | IF '(' expr ')' statement ELSE statement
+    | WHILE '(' expr ')' statement
+    | RETURN ';'
+    | RETURN expr ';'
+    | PRINT ';
+    | PRINT expr_list ';'
+    | SCAN id_list ';'
+    ;
+
+statement_list
+    : statement
+    | statement_list statement
+    ;
+
+
+expr_statement
+    : ';'
+    | expr ';'
+    ;
+
+
+expr
+    : cmp_expr
+    ;
+
+cmp_expr
+    : add_expr
+    | cmp_expr CMP add_expr
+    ;
+
+add_expr
+    : mul_expr
+    | add_expr '+' mul_expr
+    | add_expr '-' mul_expr
+    ;
+
+mul_expr
+    : primary_expr
+    | mul_expr '*' primary_expr
+    | mul_expr '/' primary_expr
+    | mul_expr '%' primary_expr
+    | '-' primary_expr
+    ;
+
+primary_expr
+    : ID '(' expr_list ')'
+    | ID '(' ')'
+    | '(' expr ')'
+    | ID
+    | NUMBER
+    | STRING
+    | ID ASSIGN expr
+    | ID '=' expr
+    | ID '[' expr ']'
+    | ID '[' expr ']' '=' expr
+    ;
+expr_list
+    : expr
+    | expr_list ',' expr
+    ;
+id_list
+    : ID
+    | id_list ',' ID
+    ;
+
+

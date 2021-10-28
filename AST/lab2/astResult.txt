@@ -1,0 +1,59 @@
+int array2[10] = {10,9,8,7};
+
+str f(int a)
+{
+	str b = "aaa" + "ddd";
+	str c = "ccc" + "bb";
+	print c;
+	return c;
+}
+
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+
+decl    .    0
+  type    .    1
+  list    .    1
+    arrayInitDecl    .    0
+      arrayDecl    array2    0
+        constRef    .    0
+          intValue    .    10
+      list    .    4
+        intValue    .    10
+        intValue    .    9
+        intValue    .    8
+        intValue    .    7
+funcDef    .    2
+  funcDecl    .    0
+    varDecl    f    0
+    list    .    1
+      parameter    a    0
+        type    .    1
+  compStmt    .    0
+    list    .    4
+      decl    .    1
+        type    .    2
+        list    .    1
+          varInitDecl    .    1
+            varDecl    b    0
+            expr    .    43
+              constRef    .    0
+                strValue    aaa    3
+              constRef    .    0
+                strValue    ddd    3
+      decl    .    1
+        type    .    2
+        list    .    1
+          varInitDecl    .    1
+            varDecl    c    0
+            expr    .    43
+              constRef    .    0
+                strValue    ccc    3
+              constRef    .    0
+                strValue    bb    2
+      printStmt    .    0
+        list    .    1
+          varRef    c    0
+      jumpStmt    .    1
+        varRef    c    0
+
