@@ -56,21 +56,42 @@ ID ({LETTER}|_)({LETTER}|_|{DIGIT})*
 .          	  { printf("Mystery character %c\n", *yytext); }
 %%
 
-int main(int arg,char **argv) {
-    int tok;
-	if(arg>1){
-        if(!(yyin=fopen(argv[1],"r"))){
-            perror(argv[1]);
-            return 1;
-        }
-    }
+// int main(int arg,char **argv) {
+//     int tok;
+// 	if(arg>1){
+//         if(!(yyin=fopen(argv[1],"r"))){
+//             perror(argv[1]);
+//             return 1;
+//         }
+//     }
     
-    while(tok = yylex()){
-        if(tok == tok_ID)
-            printf("%d %s\n", tok_ID,yyID);
-        else if(tok == tok_INTEGER) 
-            printf("%d %d\n", tok_INTEGER,yyNUM);
-        else 
-            printf("%d\n",tok);
-    }
+//     while(tok = yylex()){
+//         if(tok == tok_ID)
+//             printf("%d %s\n", tok_ID,yyID);
+//         else if(tok == tok_INTEGER) 
+//             printf("%d %d\n", tok_INTEGER,yyNUM);
+//         else 
+//             printf("%d\n",tok);
+//     }
+// }
+
+int yyerror(char *s)
+{
+	fprintf(stderr, "error: %s\n", s);
+	return 0;
+}
+
+int yywrap()
+{
+	return 1;
+}
+
+void yyputback(char* yytext)
+{
+	char *tmpStr = strdup(yytext);
+	int len = strlen(tmpStr);
+	for(int i = len - 1; i >= 0; i--){
+		unput(tmpStr[i]);
+	}
+	unput(' ');
 }

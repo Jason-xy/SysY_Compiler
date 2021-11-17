@@ -9,9 +9,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <tok.h>
+#include "tok.h"
 
 extern int yylex();
+extern void yyputback(char* yytext);
+extern FILE* yyin;
+extern char* yytext;
 extern char* yyID;
 extern int yyNUM;
 
@@ -53,33 +56,118 @@ int tok;
 
 void advance(void){
 	tok = yylex();
-	printf("tok: %s\n", yytext);
+	printf("tok: %d\t%s\n", tok, yytext);
 }
 
 void error(void){
 	printf("The match failed, please check\n");
 	exit(0);
 }
+
+int main(int argc, char **argv)
+{
+	// if(argc != 2 )
+	// {
+	// 	printf("input file is needed.\n");
+	// 	return 0;
+	// }
+	// FILE* yyin = fopen(argv[1], "r");
+	setbuf(stdout,NULL);
+	yyin = fopen("/home/jason/github/SysY_Compiler/test_cases/10_break.c", "r");
+	advance();
+	int r = CompUnit();
+	printf("result: %d\n", r);
+	// past rr = astExpr();
+	// showAst(rr, 0);
+
+	return 0;
+}
+
 // CompUnit
 //		：Decl 
 //		| FuncDef
 //		| CompUnit Decl
 //		| CompUnit FuncDef
 int CompUnit(void){
-    if (tok == 'q') {
-		exit(0);
+	if(tok == tok_CONST || tok == tok_VOID || tok == tok_INT){
+		if(tok == tok_CONST){
+			if(!Decl());
+			else return 1;
+		}
+		else if(tok == tok_VOID){
+			if(!FuncDef());
+			else return 1;
+		}
+		else{ 
+			char* s0 = strdup(yytext);
+			advance();
+			if(tok == tok_ID){
+				char* s1 = strdup(yytext);
+				advance();
+				if(tok == tok_LPAR){
+					yyputback(yytext);
+					yyputback(s1);
+					yyputback(s0);
+					advance();
+					if(!FuncDef());
+					else return 1;
+				}
+				else{
+					yyputback(yytext);
+					yyputback(s1);
+					yyputback(s0);
+					advance();
+					if(!Decl());
+					else return 1;
+				}
+			}
+			else return 1;
+		}
 	}
-    if(!Decl())
-	else if(!FuncDef())
-	else error();
-    while (1) {
-		if (tok == '\n' || tok == EOF || tok == EOL) {
+	else return 1;
+
+	while(1){
+		if (tok == '\n' || tok == EOF || tok == 0) {
 			return 0;
 		}
-		if(!Decl())
-		else if(!FuncDef())
-		else error();
+		if(tok == tok_CONST || tok == tok_VOID || tok == tok_INT){
+			if(tok == tok_CONST){
+				if(!Decl());
+				else return 1;
+			}
+			else if(tok == tok_VOID){
+				if(!FuncDef());
+				else return 1;
+			}
+			else{ 
+				char* s0 = strdup(yytext);
+				advance();
+				if(tok == tok_ID){
+					char* s1 = strdup(yytext);
+					advance();
+					if(tok == tok_LPAR){
+						yyputback(yytext);
+						yyputback(s1);
+						yyputback(s0);
+						advance();
+						if(!FuncDef());
+						else return 1;
+					}
+					else{
+						yyputback(yytext);
+						yyputback(s1);
+						yyputback(s0);
+						advance();
+						if(!Decl());
+						else return 1;
+					}
+				}
+				else return 1;
+			}
+		}
+		else return 1;
 	}
+
 	return 0;
 }
 
@@ -87,10 +175,14 @@ int CompUnit(void){
 //		: ConstDecl
 //		| VarDecl
 int Decl(void){
-    if(!ConstDecl())
-	else if(!VarDecl())
-	else error();
-    return 0;
+	if(tok == tok_CONST){
+		if(!ConstDecl());
+		else return 1;
+	}
+	else if(!VarDecl());
+	else return 1;
+
+	return 0;
 }
 
 //ConstDecl
@@ -100,25 +192,25 @@ int ConstDecl(void){
 	if(tok == tok_CONST){
 		advance();
 		// BType
-		if(!BType())
-		else error();
+		if(!BType());
+		else { return 1;}
 
 		// ConstDef
-		if(!ConstDef())
-		else error();
+		if(!ConstDef());
+		else return 1;
 
 		// { ',' ConstDef }
 		while(tok == tok_COMMA){
 			advance();
-			if(!ConstDef())
-			else error();
+			if(!ConstDef());
+			else { return 1;}
 		}
 		// ';'
 		if(tok == tok_SEMICOLON)
 			advance();
-		else error();
+		else return 1;
 	}
-	else error();
+	else return 1;
 	return 0;
 }
 
@@ -128,7 +220,7 @@ int BType(void){
 	if(tok == tok_INT){
 		advance();
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -143,24 +235,24 @@ int ConstDef(void){
 		while(tok == tok_LSQUARE){
 			advance();
 			// ConstExp
-			if(!ConstExp())
-			else error();
+			if(!ConstExp());
+			else { return 1;}
 			// ']'
 			if(tok == tok_RSQUARE){
 				advance();
 			}
-			else error();
+			else { return 1;}
 		}
 		// '='
 		if(tok == tok_ASSIGN){
 			advance();
 		}
-		else error();
+		else { return 1;}
 		// ConstInitVal
-		if(!ConstInitVal())
-		else error();
+		if(!ConstInitVal());
+		else return 1;
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -170,26 +262,27 @@ int ConstDef(void){
 //		| '{' [ ConstInitVal { ',' ConstInitVal } ] '}'
 int ConstInitVal(void){
 	// ConstExp
-	if(!ConstExp())
-	else if(tok == tok_LBRACKET){
+	if(tok == tok_LBRACKET){
 		advance();
 		// [ ConstInitVal { ',' ConstInitVal } ]
 		if(!ConstInitVal()){
 			while(tok == tok_COMMA){
 				advance();
-				if(!ConstInitVal())
-				else error();
+				if(!ConstInitVal()){
+					// '}'
+					if(tok == tok_RBRACKET){
+						advance();
+						return 0;
+					}
+					else ;
+				}
+				else return 1;
 			}
 		}
-		else ;
-
-		// '}'
-		if(tok == tok_RBRACKET){
-			advance();
-		}
-		else error();
+		else return 1;
 	}
-	else error();
+	else if(!ConstExp());
+	else return 1;
 
 	return 0;
 }
@@ -201,17 +294,17 @@ int VarDecl(void){
 		if(!VarDef()){
 			while(tok == tok_COMMA){
 				advance();
-				if(!VarDef())
-				else error();
+				if(!VarDef());
+				else { return 1;}
 			}
 			if(tok == tok_SEMICOLON){
 				advance();
 			}
-			else error();
+			else { return 1;}
 		}
-		else error();
+		else return 1;
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -228,20 +321,21 @@ int VarDef(void){
 			if(!ConstExp()){
 				if(tok == tok_RSQUARE){
 					advance();
+
 				}
-				else error();
+				else {  return 1;}
 			}
-			else error();
+			else { return 1;}
 		}
 		// '=' InitVal
 		if(tok == tok_ASSIGN){
 			advance();
-			if(!InitVal())
-			else error();
+			if(!InitVal());
+			else return 1;
 		}
-		else ;
+					else ;
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -250,16 +344,15 @@ int VarDef(void){
 //		: Exp 
 //		| '{' [ InitVal { ',' InitVal } ] '}'
 int InitVal(void){
-	if(!Exp())
-	else if(tok == tok_LBRACKET){
+	if(tok == tok_LBRACKET){
 		advance();
 		// [ InitVal { ',' InitVal } ]
 		if(!InitVal()){
 			// { ',' InitVal }
 			while(tok == tok_COMMA){
 				advance();
-				if(!InitVal())
-				else error();
+				if(!InitVal());
+				else return 1;
 			}
 		}
 		else ;
@@ -267,9 +360,10 @@ int InitVal(void){
 		if(tok == tok_RBRACKET){
 			advance();
 		}
-		else error();
+		else return 1;
 	}
-	else error();
+	else if(!Exp());
+	else return 1;
 
 	return 0;
 }
@@ -282,20 +376,20 @@ int FuncDef(void){
 			advance();
 			if(tok == tok_LPAR){
 				advance();
-				if(!FuncFParams())
+				if(!FuncFParams());
 				else ;
 				if(tok == tok_RPAR){
 					advance();
-					if(!Block())
-					else error();
+					if(!Block());
+					else {   return 1;}
 				}
-				else error();
+				else {  return 1;}
 			}
-			else error();
+			else { return 1;}
 		}
-		else error();
+		else return 1;
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -310,7 +404,7 @@ int FuncType(void){
 	else if(tok == tok_INT){
 		advance();
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -321,11 +415,11 @@ int FuncFParams(void){
 	if(!FuncFParam()){
 		while(tok == tok_COMMA){
 			advance();
-			if(!FuncFParam())
-			else error();
+			if(!FuncFParam());
+			else { return 1;}
 		}
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -337,29 +431,29 @@ int FuncFParam(void){
 		if(tok == tok_ID){
 			advance();
 		}
-		else error();
+		else return 1;
 
 		if(tok == tok_LSQUARE){
 			advance();
 			if(tok == tok_RSQUARE){
 				advance();
 			}
-			else error();
+			else { return 1;}
 
 			while(tok == tok_LSQUARE){
 				advance();
-				if(!Exp())
-				else error();
+				if(!Exp());
+				else { return 1;}
 
 				if(tok == tok_RSQUARE){
 					advance();
 				}
-				else error();
+				else { return 1;}
 			}
 		}
 		else ;
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -373,9 +467,9 @@ int Block(void){
 		if(tok == tok_RBRACKET){
 			advance();
 		}
-		else error();
+		else { return 1;}
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -384,9 +478,9 @@ int Block(void){
 //		: Decl 
 //		| Stmt
 int BlockItem(void){
-	if(!Decl())
-	else if(!Stmt())
-	else error();
+	if(!Decl());
+	else if(!Stmt());
+	else return 1;
 }
 
 // Stmt
@@ -399,90 +493,94 @@ int BlockItem(void){
 //		| 'continue' ';'
 //		| 'return' [Exp] ';'
 int Stmt(void){
-	if(!LVal()){
-		if(tok == tok_ASSIGN){
-			advance();
-			if(!Exp())
-			else error();
-			if(tok == tok_SEMICOLON){
-				advance();
-			}
-			else error();
-		}
-		else error();
-	}
-	else if(!Exp()){
-		if(tok == tok_SEMICOLON){
-			advance();
-		}
-		else error();
-	}
-	else if(tok == tok_SEMICOLON){
-		advance();
-	}
-	else if(!Block())
-	else if(tok == tok_IF){
+	if(tok == tok_IF){
 		advance();
 		if(tok == tok_LPAR){
 			advance();
-			if(!Cond())
-			else error();
+			if(!Cond());
+			else return 1;
 			if(tok == tok_RPAR){
 				advance();
+				if(!Stmt()){
+					if(tok == tok_ELSE){
+						advance();
+						if(!Stmt());
+						else return 1;
+					}
+					else ;
+				}
+				else return 1;
 			}
-			else error();
+			else return 1;
 		}
-		else error();
-
-		if(!Stmt())
-		else error();
-
-		if(tok == tok_ELSE){
-			advance();
-			if(!Stmt())
-			else error();
-		}
-		else ;
+		else return 1;
 	}
 	else if(tok == tok_WHILE){
 		advance();
 		if(tok == tok_LPAR){
 			advance();
-			if(!Cond())
-			else error();
-			if(tok == tok_RPA){
+			if(!Cond());
+			else return 1;
+			if(tok == tok_RPAR){
 				advance();
+				if(!Stmt());
+				else return 1;
 			}
-			else error();
-			if(!Stmt())
-			else error();
+			else return 1;
 		}
-		else error();
+		else return 1;
 	}
 	else if(tok == tok_BREAK){
 		advance();
 		if(tok == tok_SEMICOLON){
 			advance();
 		}
-		else error();
+		else return 1;
 	}
 	else if(tok == tok_CONTINUE){
 		advance();
 		if(tok == tok_SEMICOLON){
 			advance();
 		}
-		else error();
+		else return 1;
 	}
 	else if(tok == tok_RETURN){
 		advance();
-		if(!Exp())
+		if(!Exp());
 		else ;
 		if(tok == tok_SEMICOLON){
 			advance();
 		}
-		else error();
+		else return 1;
 	}
-	else error();
+	else if(tok == tok_SEMICOLON){
+		return 0;
+	}
+	else if(tok == tok_ID){
+		if(!LVal()){
+			if(tok == tok_ASSIGN){
+				advance();
+				if(!Exp()){
+					if(tok == tok_SEMICOLON)
+						advance();
+				}
+				else return 1;
+			}
+			else return 1;
+		}
+		else return 1;
+	}
+	else if(tok == tok_LBRACKET){
+		if(!Block());
+		else return 1;
+	}
+	else if(!Exp()){
+		if(tok == tok_SEMICOLON){
+			advance();
+		}
+		else return 1;
+	}
+	else return 1;
 
 	return 0;
 }
@@ -490,8 +588,9 @@ int Stmt(void){
 // Exp
 //		: AddExp 
 int Exp(void){
-	if(!AddExp())
-	else error();
+	
+	if(!AddExp());
+	else return 1;
 	
 	return 0;
 }
@@ -499,8 +598,8 @@ int Exp(void){
 // Cond
 //		: LOrExp
 int Cond(void){
-	if(!LOrExp())
-	else error();
+	if(!LOrExp());
+	else return 1;
 
 	return 0;
 }
@@ -512,15 +611,15 @@ int LVal (void){
 		advance();
 		while(tok == tok_LSQUARE){
 			advance();
-			if(!Exp())
-			else error();
+			if(!Exp());
+			else return 1;
 			if(tok == tok_RSQUARE){
 				advance();
 			}
-			else error();
+			else { return 1;}
 		}
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -532,16 +631,21 @@ int LVal (void){
 int PrimaryExp(void){
 	if(tok == tok_LPAR){
 		advance();
-		if(!Exp())
-		else error();
+		if(!Exp());
+		//modified
+		else ;
+
 		if(tok == tok_RPAR){
 			advance();
 		}
-		else error();
+		else return 1;
 	}
-	else if(!LVal())
-	else if(!Number())
-	else error();
+	else if(tok == tok_INTEGER){
+		if(!Number());
+		else return 1;
+	}
+	else if(!LVal());
+	else return 1;
 
 	return 0;
 }
@@ -549,8 +653,10 @@ int PrimaryExp(void){
 // Number
 //		：IntConst
 int Number(void){
-	if(!IntConst())
-	else error();
+	if(tok == tok_INTEGER){
+		advance();
+	}
+	else return 1;
 
 	return 0;
 }
@@ -560,25 +666,34 @@ int Number(void){
 //		| Ident '(' [FuncRParams] ')'
 //		| UnaryOp UnaryExp
 int UnaryExp(void){
-	if(!PrimaryExp())
+
+	if(tok == tok_ADD || tok == tok_SUB || tok == tok_NOT){
+		advance();
+		while(tok == tok_ADD || tok == tok_SUB || tok == tok_NOT){
+			advance();
+			if(!UnaryOp()){
+				if(!UnaryExp);
+				return 1;
+			}
+			return 1;
+		}
+	}
+	else if(!PrimaryExp());
 	else if(tok == tok_ID){
+		char *s0 = strdup(yytext);
 		advance();
 		if(tok == tok_LPAR){
 			advance();
+			if(!FuncRParams());
+			else ;
+			if(tok == tok_RPAR){
+				advance();
+			}
+			else return 1;
 		}
-		else error();
-		if(!FuncRParams())
-		else ;
-		if(tok == tok_RPAR){
-			advance();
-		}
-		else error();
+		else return 1;
 	}
-	else if(!UnaryOp()){
-		if(!UnaryExp())
-		else error();
-	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -591,7 +706,7 @@ int UnaryOp(void){
 	if(tok == tok_ADD || tok == tok_SUB || tok == tok_NOT){
 		advance();
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -602,11 +717,11 @@ int FuncRParams(void){
 	if(!Exp()){
 		while(tok == tok_COMMA){
 			advance();
-			if(!Exp())
-			else error();
+			if(!Exp());
+			else { return 1;}
 		}
 	}
-	else error();
+	else return 1;
 
 	return 0;
 }
@@ -615,16 +730,15 @@ int FuncRParams(void){
 //		: UnaryExp 
 //		| MulExp ('*' | '/' | '%') UnaryExp
 int MulExp(void){
-	if(!UnaryExp())
-	else if(!MulExp()){
-		if(tok == tok_MUL || tok == tok_DIV || tok == tok_MODULO){
-			advance();
-		}
-		else error();
-		if(!UnaryExp())
-		else error();
+
+	if(!UnaryExp());
+	else return 1;
+
+	while(tok == tok_MUL || tok == tok_DIV || tok == tok_MODULO){
+		advance();
+		if(!UnaryExp());
+		else return 1;
 	}
-	else error();
 
 	return 0;
 }
@@ -633,16 +747,15 @@ int MulExp(void){
 //		: MulExp 
 //		| AddExp ('+' | '−') MulExp
 int AddExp(void){
-	if(!MulExp())
-	else if(!AddExp()){
-		if(tok == tok_ADD || tok == tok_SUB){
-			advance();
-		}
-		else error();
-		if(!MulExp())
-		else error();
+
+	if(!MulExp());
+	else return 1;
+
+	while(tok == tok_ADD || tok == tok_SUB){
+		advance();
+		if(!MulExp());
+		else return 1;
 	}
-	else error();
 
 	return 0;
 }
@@ -651,16 +764,15 @@ int AddExp(void){
 //		: AddExp 
 //		| RelExp ('<' | '>' | '<=' | '>=') AddExp
 int RelExp(void){
-	if(!AddExp())
-	else if(!RelExp()){
-		if(tok == tok_LESS || tok == tok_GREAT || tok == tok_LESSEQ || tok == tok_GREATEQ){
-			advance();
-		}
-		else error();
-		if(!AddExp())
-		else error();
+
+	if(!AddExp());
+	else return 1;
+
+	while(tok == tok_LESS || tok == tok_GREAT || tok == tok_LESSEQ || tok == tok_GREATEQ){
+		advance();
+		if(!AddExp());
+		else return 1;
 	}
-	else error();
 
 	return 0;
 }
@@ -669,17 +781,16 @@ int RelExp(void){
 //		: RelExp 
 //		| EqExp ('==' | '!=') RelExp
 int EqExp(void){
-	if(!RelExp())
-	else if(!EqExp()){
-		if(tok == tok_EQ || tok == tok_NOTEQ){
-			advance();
-		}
-		else error();
-		if(!RelExp())
-		else error();
-	}
-	else error();
 
+	if(!RelExp());
+	else return 1;
+
+	while(tok == tok_EQ || tok == tok_NOTEQ){
+		advance();
+		if(!RelExp());
+		else return 1;
+	}
+	
 	return 0;
 }
 
@@ -687,44 +798,43 @@ int EqExp(void){
 //		: EqExp 
 //		| LAndExp '&&' EqExp
 int LAndExp(void){
-	if(!EqExp())
-	else if(!LAndExp()){
-		if(tok == tok_AND){
-			advance();
-		}
-		else error();
-		if(!EqExp())
-		else error();
+
+	if(!EqExp());
+	else return 1;
+
+	while(tok == tok_AND){
+		advance();
+		if(!EqExp());
+		else return 1;
 	}
-	else error();
 
 	return 0;
-
 }
 
 // LOrExp
 //		: LAndExp 
 //		| LOrExp '||' LAndExp
 int LOrExp(void){
-	if(!LAndExp())
-	else if(!LOrExp()){
-		if(tok == tok_OR){
-			advance();
-		}
-		else error();
-		if(!LAndExp())
-		else error();
+
+	if(!LAndExp());
+	else return 1;
+
+	while(tok == tok_OR){
+		advance();
+		if(!LAndExp());
+		else return 1;
 	}
-	else error();
-	
+
 	return 0;
 }
 
 // ConstExp
 //		: AddExp
 int ConstExp(void){
-	if(!AddExp())
-	else error();
+	if(!AddExp());
+	else return 1;
 
 	return 0;
 }
+
+
