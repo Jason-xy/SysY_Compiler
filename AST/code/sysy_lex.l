@@ -42,6 +42,9 @@ char* yylstr = NULL;
 %}
 
 %%
+\/\*(\s|.)*?\*\/ { /* ignore note */ }
+\/\/.* { /* ignore note */ }
+[ \t] { /* ignore whitespace */ }
 [_a-zA-Z][_ a-zA-Z0-9]* { yylstr = yytext; return tok_ID; }
 [0-9]+ { yylval = atoi(yytext); return tok_INTEGER; }
 "\bint\b" { return tok_INT; }
@@ -56,7 +59,7 @@ char* yylstr = NULL;
 "+" { return tok_ADD; }
 "-" { return tok_SUB; }
 "*" { return tok_MUL; }
-"/"&\/\/.* { return tok_DIV; }
+"/" { return tok_DIV; }
 "%" { return tok_MODULO; }
 "<" { return tok_LESS; }
 "<=" { return tok_LESSEQ; }
@@ -76,9 +79,6 @@ char* yylstr = NULL;
 "]" { return tok_RSQUARE; }
 "," { return tok_COMMA; }
 ";" { return tok_SEMICOLON; }
-\/\*(\s|.)*?\*\/ { /* ignore note */ }
-\/\/.* { /* ignore note */ }
-[ \t] { /* ignore whitespace */ }
 . 	{ printf("Mystery character %c\n", *yytext); }
 %%
 
