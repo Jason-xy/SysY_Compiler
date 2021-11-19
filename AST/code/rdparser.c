@@ -90,21 +90,25 @@ void error(void)
 
 int main(int argc, char **argv)
 {
-	// if(argc != 2 )
-	// {
-	// 	printf("input file is needed.\n");
-	// 	return 0;
-	// }
-	// FILE* yyin = fopen(argv[1], "r");
+	if (argc != 2)
+	{
+		printf("Usage: ./rdparser <input file path>\n");
+		return 0;
+	}
+	yyin = fopen(argv[1], "r");
 	setbuf(stdout, NULL);
 	// yyin = fopen("../../test_cases/59_sort_test7.c", "r");
-	yyin = fopen("test.c", "r");
+	// yyin = fopen("test.c", "r");
 	advance();
 	past r = astCompUnit();
-	showAst(r, 0);
-	// printf("result: %d\n", r);
-	//  past rr = astExpr();
-	//  showAst(rr, 0);
+	if (r)
+	{
+		printf("\n[Syntax analysis is complete !]\n\n");
+		showAst(r, 0);
+		printf("\n[AST build is complete !]\n\n");
+	}
+	else
+		printf("\n[ERROR]!\n");
 
 	return 0;
 }
@@ -202,6 +206,30 @@ past newExpr(int oper, past left, past right, past next)
 	case tok_OR:
 		var->value.svalue = "||";
 		break;
+	case tok_ADD:
+		var->value.svalue = "+";
+		break;
+	case tok_SUB:
+		var->value.svalue = "-";
+		break;
+	case tok_MUL:
+		var->value.svalue = "*";
+		break;
+	case tok_DIV:
+		var->value.svalue = "/";
+		break;
+	case tok_MODULO:
+		var->value.svalue = "%";
+		break;
+	case tok_LESS:
+		var->value.svalue = "<";
+		break;
+	case tok_GREAT:
+		var->value.svalue = ">";
+		break;
+	case tok_NOT:
+		var->value.svalue = "!";
+		break;
 	default:
 		var->value.svalue = "@";
 		break;
@@ -248,7 +276,7 @@ void showAst(past node, int nest)
 	else if (strcmp(node->nodeType, "expr") == 0)
 	{
 		if (strcmp(node->value.svalue, "@") == 0)
-			printf("%s    .    '%c'\n", node->nodeType, (char)node->value.ivalue);
+			printf("%s    .    '%c'\n", node->nodeType, '@');
 		else
 			printf("%s    .    %s\n", node->nodeType, node->value.svalue);
 	}
