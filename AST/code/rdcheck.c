@@ -73,10 +73,13 @@ int main(int argc, char **argv)
 	// }
 	// FILE* yyin = fopen(argv[1], "r");
 	setbuf(stdout,NULL);
-	yyin = fopen("/home/jason/github/SysY_Compiler/test_cases/10_break.c", "r");
+	yyin = fopen("../../test_cases/59_sort_test7.c", "r");
 	advance();
 	int r = CompUnit();
-	printf("result: %d\n", r);
+	if(r == 1)
+		printf("The match failed, please check !\n");
+	else
+		printf("Syntax analysis is complete !\n");
 	// past rr = astExpr();
 	// showAst(rr, 0);
 
@@ -193,7 +196,7 @@ int ConstDecl(void){
 		advance();
 		// BType
 		if(!BType());
-		else { return 1;}
+		else return 1;
 
 		// ConstDef
 		if(!ConstDef());
@@ -203,7 +206,7 @@ int ConstDecl(void){
 		while(tok == tok_COMMA){
 			advance();
 			if(!ConstDef());
-			else { return 1;}
+			else return 1;
 		}
 		// ';'
 		if(tok == tok_SEMICOLON)
@@ -241,15 +244,15 @@ int ConstDef(void){
 			if(tok == tok_RSQUARE){
 				advance();
 			}
-			else { return 1;}
+			else return 1;
 		}
 		// '='
 		if(tok == tok_ASSIGN){
 			advance();
+			// ConstInitVal
+			if(!ConstInitVal());
+			else return 1;
 		}
-		else { return 1;}
-		// ConstInitVal
-		if(!ConstInitVal());
 		else return 1;
 	}
 	else return 1;
@@ -295,12 +298,12 @@ int VarDecl(void){
 			while(tok == tok_COMMA){
 				advance();
 				if(!VarDef());
-				else { return 1;}
+				else return 1;
 			}
 			if(tok == tok_SEMICOLON){
 				advance();
 			}
-			else { return 1;}
+			else return 1;
 		}
 		else return 1;
 	}
@@ -381,11 +384,11 @@ int FuncDef(void){
 				if(tok == tok_RPAR){
 					advance();
 					if(!Block());
-					else {   return 1;}
+					else return 1;
 				}
-				else {  return 1;}
+				else return 1;
 			}
-			else { return 1;}
+			else return 1;
 		}
 		else return 1;
 	}
@@ -557,7 +560,21 @@ int Stmt(void){
 		return 0;
 	}
 	else if(tok == tok_ID){
-		if(!LVal()){
+		char * s0 = strdup(yytext);
+		advance();
+		yyputback(yytext);
+		yyputback(s0);
+		if(tok == tok_LPAR){
+			advance();
+			if(!Exp()){
+				if(tok == tok_SEMICOLON){
+					advance();
+				}
+				else return 1;
+			}
+			else return 1;
+		}
+		else if(advance(), !LVal()){
 			if(tok == tok_ASSIGN){
 				advance();
 				if(!Exp()){
@@ -678,7 +695,6 @@ int UnaryExp(void){
 			return 1;
 		}
 	}
-	else if(!PrimaryExp());
 	else if(tok == tok_ID){
 		char *s0 = strdup(yytext);
 		advance();
@@ -691,8 +707,16 @@ int UnaryExp(void){
 			}
 			else return 1;
 		}
-		else return 1;
+		else
+		{
+			yyputback(yytext);
+			yyputback(s0);
+			advance();
+			if(!PrimaryExp());
+			else return 1;
+		}
 	}
+	else if(!PrimaryExp());
 	else return 1;
 
 	return 0;
