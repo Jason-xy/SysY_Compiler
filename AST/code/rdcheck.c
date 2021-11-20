@@ -67,14 +67,13 @@ void error(void)
 
 int main(int argc, char **argv)
 {
-	// if(argc != 2 )
-	// {
-	// 	printf("input file is needed.\n");
-	// 	return 0;
-	// }
-	// FILE* yyin = fopen(argv[1], "r");
+	if (argc != 2)
+	{
+		printf("Usage: ./rdcheck <input file path>\n");
+		return 0;
+	}
+	yyin = fopen(argv[1], "r");
 	setbuf(stdout, NULL);
-	yyin = fopen("../../test_cases/59_sort_test7.c", "r");
 	advance();
 	int r = CompUnit();
 	if (r == 1)
