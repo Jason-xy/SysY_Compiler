@@ -1,0 +1,350 @@
+From: <Saved by UnMHT Ver.7.2.0.2>
+Subject: A Simple Makefile Tutorial
+Date: Thu, 23 Oct 2014 12:23:13 +0800
+MIME-Version: 1.0
+X-UnMHT-Save-State: Current-State
+Content-Type: multipart/related;
+	boundary="----=_Part_CB2364AD_5BF11716.1493B3E86BB";
+	type="text/html"
+
+------=_Part_CB2364AD_5BF11716.1493B3E86BB
+Content-Location: http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html;
+	charset="windows-1252"
+
+<html><head><meta http-equiv=3D"Content-Type" content=3D"text/html; charset=
+=3Dwindows-1252"><link href=3D"data:image/gif;base64,R0lGODlhEAAQAMQAAPT0+b=
+Gx0eXl8tzc6kNDj5GRvFhYm39/spiYw8LC4sXF3KGhx8HB2i4ugTw8iWxsp7Cw0ODg7c/P4hgYd=
+P///wAAZgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAQABAAAAVJ=
+YCWOZGmeaFVIrMQsizkNzDQaQGIOg1nopAPlISuUJBRbagSgLEmK5FMUJUwrAUrg5Cg1mlYSYVv=
+CAQ62CUKiLE0ggngEca0vQwA7" rel=3D"shortcut icon" type=3D"image/gif">
+<title>
+A Simple Makefile Tutorial</title>
+<base href=3D"http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/"=
+></head>
+<body bgcolor=3D"9f9faf">
+
+<img src=3D"/images/maxwell/bar.gif" width=3D"100%">
+
+<h2 align=3D"center">
+A Simple Makefile Tutorial</h2>
+
+<p>
+Makefiles are a simple way to organize code compilation. This tutorial
+does not even scratch the surface of what is possible using
+<em>make</em>, but is intended as a starters guide so that you can
+quickly and easily create your own makefiles for small to medium-sized
+projects.</p>
+
+<h3>
+A Simple Example</h3>
+
+<p>
+Let&#x27;s start off with the following three files, hellomake.c,
+hellofunc.c, and hellomake.h, which would represent a typical main
+program, some functional code in a separate file, and an include file,
+respectively.</p>
+
+<table border=3D"1">
+<tbody><tr>
+<th>hellomake.c</th><th>hellofunc.c</th><th>hellomake.h</th></tr>
+<tr><td>
+<pre>#include <hellomake.h>
+
+int main() {
+  // call a function in another file
+  myPrintHelloMake();
+
+  return(0);
+}
+</hellomake.h></pre>
+</td>
+<td>
+<pre>#include <stdio.h>
+#include <hellomake.h>
+
+void myPrintHelloMake(void) {
+
+  printf(&quot;Hello makefiles!\n&quot;);
+
+  return;
+}
+</hellomake.h></stdio.h></pre>
+</td>
+<td>
+<pre>/*
+example include file
+*/
+
+void myPrintHelloMake(void);
+</pre>
+</td>
+</tr>
+</tbody></table>
+
+<p>
+Normally, you would compile this collection of code by executing the follow=
+ing command:</p>
+
+<p>
+<tt>gcc -o hellomake hellomake.c hellofunc.c -I.</tt></p>
+
+<p>
+This compiles the two .c files and names the executable hellomake. The
+<tt>-I.</tt> is included so that gcc will look in the current
+directory (.) for the include file hellomake.h. Without a makefile,
+the typical approach to the test/modify/debug cycle is to use the up
+arrow in a terminal to go back to your last compile command so you
+don&#x27;t have to type it each time, especially once you&#x27;ve added a f=
+ew
+more .c files to the mix.</p>
+
+<p>
+Unfortunately, this approach to compilation has two downfalls. First,
+if you lose the compile command or switch computers you have to retype
+it from scratch, which is inefficient at best. Second, if you are only
+making changes to one .c file, recompiling all of them every time is
+also time-consuming and inefficient. So, it&#x27;s time to see what we can
+do with a makefile.</p>
+
+<p>
+The simplest makefile you could create would look something like:</p>
+
+<a href=3D"makefile.1">Makefile 1</a>
+<pre>hellomake: hellomake.c hellofunc.c
+     gcc -o hellomake hellomake.c hellofunc.c -I.
+</pre>
+
+<p>
+If you put this rule into a file called <tt>Makefile</tt> or
+<tt>makefile</tt> and then type <tt>make</tt> on the command line it
+will execute the compile command as you have written it in the
+makefile. Note that <tt>make</tt> with no arguments executes the first
+rule in the file. Furthermore, by putting the list of files on which
+the command depends on the first line after the <tt>:</tt>, make knows
+that the rule <tt>hellomake</tt> needs to be executed if any of those
+files change. Immediately, you have solved problem #1 and can avoid
+using the up arrow repeatedly, looking for your last compile
+command. However, the system is still not being efficient in terms of
+compiling only the latest changes.</p>
+
+<p>
+One very important thing to note is that there is a tab before the gcc
+command in the makefile. There must be a tab at the beginning of any
+command, and <tt>make</tt> will not be happy if it&#x27;s not there.</p>
+
+<p>
+In order to be a bit more efficient, let&#x27;s try the following:</p>
+
+<a href=3D"makefile.2">Makefile 2</a>
+<pre>CC=3Dgcc
+CFLAGS=3D-I.
+
+hellomake: hellomake.o hellofunc.o
+     $(CC) -o hellomake hellomake.o hellofunc.o -I.
+
+</pre>
+
+<p>
+So now we&#x27;ve defined some constants <tt>CC</tt> and
+<tt>CFLAGS</tt>. It turns out these are special constants that
+communicate to <tt>make</tt> how we want to compile the files
+hellomake.c and hellofunc.c. In particular, the macro <tt>CC</tt> is
+the C compiler to use, and <tt>CFLAGS</tt> is the list of flags to
+pass to the compilation command. By putting the object
+files--hellomake.o and hellofunc.o--in the dependency list and in the
+rule, <tt>make</tt> knows it must first compile the .c versions
+individually, and then build the executable hellomake.</p>
+
+<p>
+Using this form of makefile is sufficient for most small scale
+projects. However, there is one thing missing: dependency on the
+include files.  If you were to make a change to hellomake.h, for
+example, <tt>make</tt> would not recompile the .c files, even though
+they needed to be. In order to fix this, we need to tell <tt>make</tt>
+that all .c files depend on certain .h files. We can do this by
+writing a simple rule and adding it to the makefile.</p>
+
+<a href=3D"makefile.3">Makefile 3</a>
+<pre>CC=3Dgcc
+CFLAGS=3D-I.
+DEPS =3D hellomake.h
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $&lt; $(CFLAGS)
+
+hellomake: hellomake.o hellofunc.o=20
+	gcc -o hellomake hellomake.o hellofunc.o -I.
+</pre>
+
+<p>
+This addition first creates the macro DEPS, which is the set of .h
+files on which the .c files depend. Then we define a rule that applies
+to all files ending in the .o suffix. The rule says that the .o file
+depends upon the .c version of the file and the .h files included in
+the DEPS macro. The rule then says that to generate the .o file,
+<tt>make</tt> needs to compile the .c file using the compiler defined
+in the CC macro. The -c flag says to generate the object file, the
+<tt>-o $@</tt> says to put the output of the compilation in the file
+named on the left side of the <tt>:</tt>, the <tt>$&lt;</tt> is the first i=
+tem in
+the dependencies list, and the CFLAGS macro is defined as above.</p>
+
+<p>
+As a final simplification, let&#x27;s use the special macros <tt>$@</tt>
+and <tt>$^</tt>, which are the left and right sides of the <tt>:</tt>,
+respectively, to make the overall compilation rule more general. In
+the example below, all of the include files should be listed as part
+of the macro DEPS, and all of the object files should be listed as
+part of the macro OBJ.</p>
+
+<a href=3D"makefile.4">Makefile 4</a>
+<pre>CC=3Dgcc
+CFLAGS=3D-I.
+DEPS =3D hellomake.h
+OBJ =3D hellomake.o hellofunc.o=20
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $&lt; $(CFLAGS)
+
+hellomake: $(OBJ)
+	gcc -o $@ $^ $(CFLAGS)
+</pre>
+
+<p>
+So what if we want to start putting our .h files in an include
+directory, our source code in a src directory, and some local
+libraries in a lib directory?  Also, can we somehow hide those
+annoying .o files that hang around all over the place?  The answer, of
+course, is yes. The following makefile defines paths to the include
+and lib directories, and places the object files in an obj
+subdirectory within the src directory.  It also has a macro defined
+for any libraries you want to include, such as the math library
+<tt>-lm</tt>. This makefile should be located in the src
+directory. Note that it also includes a rule for cleaning up your
+source and object directories if you type <tt>make clean</tt>. The
+.PHONY rule keeps <tt>make</tt> from doing something with a file named
+clean.</p>
+
+<a href=3D"makefile.5">Makefile 5</a>
+<pre>IDIR =3D../include
+CC=3Dgcc
+CFLAGS=3D-I$(IDIR)
+
+ODIR=3Dobj
+LDIR =3D../lib
+
+LIBS=3D-lm
+
+_DEPS =3D hellomake.h
+DEPS =3D $(patsubst %,$(IDIR)/%,$(_DEPS))
+
+_OBJ =3D hellomake.o hellofunc.o=20
+OBJ =3D $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+
+$(ODIR)/%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $&lt; $(CFLAGS)
+
+hellomake: $(OBJ)
+	gcc -o $@ $^ $(CFLAGS) $(LIBS)
+
+.PHONY: clean
+
+clean:
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~=20
+</pre>
+
+<p>
+So now you have a perfectly good makefile that you can modify to
+manage small and medium-sized software projects. You can add multiple
+rules to a makefile; you can even create rules that call other
+rules. For more information on makefiles and the <tt>make</tt>
+function, check out the=20
+
+<a href=3D"http://www.gnu.org/software/make/manual/make.html">GNU Make Manu=
+al</a>,=20
+
+which will tell you more than you ever wanted to know (really).
+</p>
+
+<img src=3D"/images/maxwell/bar.gif" width=3D"100%">
+
+
+
+</body></html>
+------=_Part_CB2364AD_5BF11716.1493B3E86BB
+Content-Location: http://www.cs.colby.edu/images/maxwell/bar.gif
+Content-Transfer-Encoding: base64
+Content-Type: image/gif
+
+R0lGODlhAAQIAMYAAAYu9n6S8lJu8qKy7jpa9rrG7iZK9mqC8pam8sbO7hpC9lp28oqe8rK+7kZm
+8s7W7hI69nKK8i5S9oaa8q667kJi9p6u7mZ+8tLa7g429sLK7lZu8p6q7jJS9qq27o6e8k5q8nqO
+8h5C9j5a9i5O9m6C8srO7rrC7oaW8hY69mJ68t7e7iJG9jJW9o6i8tre7oKW8pqq8hY+9ipO9m6G
+8srS7gou9lZy8rbC7j5e9hI29lpy8l568naO8ipK9ra+7oqa8nKG8s7S7kJe9rK67kZi8qKu7l52
+8oKS8pqm8tLW7naK8iZG9ho+9tra7sbK7jpW9pai8g4y9mp+8qay7r7G7kpm8q627lJq8tba7n6O
+8iJC9goy9mZ68jZW9pKi8kZi9tzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf
+7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7dzf7SH+
+FUNyZWF0ZWQgd2l0aCBUaGUgR0lNUAAsAAAAAAAECAAAB/6AAIKDADZch4iJiohSjY0ZkJGSkzqV
+lpYQmZqbKZ2en54yoqNNpaanqKUKCiKtrq+wr1tbLLW2t7i1TLu8Br6/wL8+w8TFM8fIyCTLzM3N
+EtDQHdPU1dbVLV7a29zd3FDgBOLj5OUEI+jpIzns7e7sQ/Hy80MV9vf2YPr7/PxFDgAdWBlIsKDB
+giASKlzIcCGWh1gESJxIsaKADRgzbrjBsaNHjjtCihwZcoHJkwuOqFzJsuURHjBVyJxJsybNLhdy
+6tzJU+eUnz8PCB1KlGiJo0iR0ljKtGmQp1CjQo1AteqSq1izar3ao2uIr2DDig2rRUuAs2jTqj2L
+pK1bGP5w48qNi6Ku3bsT8urVC6Sv379/GQgW/KGw4cOIDbv4wrix48eOo0hGQLmy5cuUk2jeHKOz
+58+eOYgeTZqDhdOoTxtZzbq16wGwB1CZTbu27doecuvezXv3ld9XKAgfTrw4kePIjzdYzrx5gx/Q
+o0uHjqO6dRwnsmvfzv1Ege8FqogfT748eQ3o06tfr/6Je/cJ4sufP9+E/fv3a+jfz1+I//8A/vfA
+gAQqYeCBCCZoIAYYZOHggxBGCKETTrxg4YUYZmjhChyusMghhNhgyIeOcDGJI45IcokOkWySyYqg
+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
+CAA7
+
+------=_Part_CB2364AD_5BF11716.1493B3E86BB--
