@@ -32,7 +32,7 @@ typedef enum _NodeType
     NT_OP_INDEX,  // []     // Branches:2   0:Ident 1:Index
     NT_OP_ASSIGN, // =      // Branches:2   0:LVal 1:Exp
 
-    NT_FUNCCALL,  // Branches:2   0:Ident 1:VarList
+    NT_FUNCCALL, // Branches:2   0:Ident 1:VarList
 
     NT_STMT, // Branches:2   0:Stmt 1:NextStmt
 
@@ -54,7 +54,7 @@ typedef enum _NodeType
 
 #define MAX_MESSAGE_LEN 40
 
-struct _ast 
+struct _ast
 {
     int line;
     int value;

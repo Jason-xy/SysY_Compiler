@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     yyparse();
     printAst(g_root, ast);
     fclose(ast);
-    
+
     genRoot(g_root);
 
     fclose(yyin);

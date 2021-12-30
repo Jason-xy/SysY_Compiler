@@ -1,123 +1,242 @@
 %{
 
 #include <stdio.h>
-#include "tok.h"
-#incldue "ast.h"
-
+#include "ast.h"
 int yylex(void);
 void yyerror(char *);
-
-past root = newAstNode_parameter(" ", "CompUnit", NULL, NULL, NULL)
-
 %}
 
-%token  tok_ID,		 // 标识符
-%token	tok_INTEGER,	 // 整数
-%token	tok_INT,		 // int
-%token	tok_VOID,		 // void
-%token	tok_CONST,		 // const
-%token	tok_IF,			 // if
-%token	tok_ELSE,		 // else
-%token	tok_WHILE,		 // while
-%token	tok_BREAK,		 // break
-%token	tok_CONTINUE,	 // continue
-%token	tok_RETURN,		 // return
-%token	tok_ADD,		 // +
-%token	tok_SUB,		 // -
-%token	tok_MUL,		 // *
-%token	tok_DIV,		 // /
-%token	tok_MODULO,		 // %
-%token	tok_LESS,		 // <
-%token	tok_LESSEQ,		 // <=
-%token	tok_GREAT,		 // >
-%token	tok_GREATEQ,	 // >=
-%token	tok_NOTEQ,		 // !=
-%token	tok_EQ,		 	 // ==
-%token	tok_NOT,		 // !
-%token	tok_AND, 		 // &&
-%token	tok_OR,			 // ||
-%token	tok_ASSIGN,		 // =
-%token	tok_LPAR,		 // (
-%token	tok_RPAR,		 // )
-%token	tok_LBRACKET,	 // {
-%token	tok_RBRACKET,	 // }
-%token	tok_LSQUARE,	 // [
-%token	tok_RSQUARE,	 // ]
-%token	tok_COMMA,		 // ,
-%token	tok_SEMICOLON	 // ;
+%union{
+    int     iValue;
+    char*   eValue;
+    past    pAst;
+};
 
+/* IF_ELSE reduce/shift conflict */
+%expect 1
+
+%token <eValue> IDentifier
+%token <iValue>	NUMBER INT VOID CONST IF ELSE WHILE BREAK CONTINUE RETURN CMP ASSIGN
+%type  <pAst>    
+	Pro CompUnit Decl ConstDecl ConstDef ConstDefs ConstExps ConstInitVal VarDecl VarDef VarDefs
+    InitVal InitVals ConstInitVals FuncDef FuncFParams LVal PrimaryExp
+    FuncFParam Block BlockItems BlockItem Stmt Exp EqExp 
+    Exps Number UnaryExp FuncRParams MulExp AddExp ConstExp Ident Declarator
+    SelectionStat ElseStat ExpressionStat IterationStat LValStat ReturnStat BreakStat ContinueStat 
 %%
-//ident
-declCompIdentifier
-: pDeclIdentifier
-| constArrayIdentifier
-;
 
-pDeclIdentifier
-: declIdentifier {$$ = new TreeNode($1);}
-| MUL pDeclIdentifier {$$ = $2; $$->pointLevel++;}
-| ADDR pDeclIdentifier {$$ = $2; $$->pointLevel--;}
-;
-
-// 常量数组标识符（仅供声明使用）
-constArrayIdentifier
-: pDeclIdentifier LBRACKET INTEGER RBRACKET {
-  $$ = $1;
-  $$->type = new Type(VALUE_ARRAY);
-  $$->type->elementType = $1->type->type;
-  $$->type->dimSize[$$->type->dim] = $3->int_val;
-  $$->type->dim++;
-}
-| constArrayIdentifier LBRACKET INTEGER RBRACKET {
-  $$ = $1;
-  $$->type->dimSize[$$->type->dim] = $3->int_val;
-  $$->type->dim++;
-}
-;
-
-declIdentifier
-: IDENTIFIER {
-	$$ = $1;
-	$$->var_scope = presentScope;
-	#ifdef ID_REDUCE_DEBUG
-		cout<<"$ reduce declIdentifier : "<<$$->var_name<<", at scope :"<<presentScope<<endl;
-	#endif
-	if (idList.count(make_pair($$->var_name, $$->var_scope)) != 0) {
-		string t = "Redeclared identifier : " + $$->var_name;
-		yyerror(t.c_str());
-	}
-	idNameList.insert(make_pair($$->var_name, $$->var_scope));
-	idList[make_pair($$->var_name, $$->var_scope)] = $$;
-}
-;
+Pro
+    : CompUnit                                      { astHead = $1; }
+    |                                               { printf("empty\n"); }
+    ;
 
 CompUnit
-：Decl {root->left = newAstChild($1);}
-| FuncDef {root->left = newAstChild($1);}
-| CompUnit Decl {root->left = newAstChild($2);}
-| CompUnit FuncDef {root->left = newAstChild($2);}
-;
+    : CompUnit Decl                                 { $$ = newCompUnit($2, $1); }                                
+    | CompUnit FuncDef                              { $$ = newCompUnit($2, $1); }
+    | Decl                                          { $$ = newCompUnit($1, NULL); }
+    | FuncDef                                       { $$ = newCompUnit($1, NULL); }
+    ;
 
-Decl
-: ConstDecl 
-| VarDecl 
-;
+Decl : ConstDecl                                    { $$ = $1; }
+    | VarDecl                                       { $$ = $1; }
+    ;
 
 ConstDecl
-: tok_CONST BType ConstDefs tok_SEMICOLON {
-  $$ = newAstNode_parameter("", "ConstDecl", NULL, NULL, NULL);
-  $$->newAstChildNext($2);
-  $$->newAstChild($3);}
-;
+    : CONST INT ConstDefs ';'                       { $$ = $3; }
+    ;
 
 ConstDefs
-: constDef {$$ = newAstNode_parameter("", "ConstDef", NULL, NULL, NULL); $$->newAstChild($1);}
-| constDefs COMMA constDef {$$ = $1; $$->newAstChild($3);}
-;
+    :ConstDef                                       { $$ = newConstDefs($1,NULL); }
+    |ConstDefs ',' ConstDef                         { $$ = newConstDefs($3,$1); }
+    ;
+ConstDef
+    : Ident ASSIGN ConstInitVal                     { $$ = newConstDef($1, NULL, $3); }
+    | Ident ConstExps ASSIGN ConstInitVal           { $$ = newConstDef($1, $2, $4); }
+    ;
 
-constDef
-: pDeclIdentifier tok_ASSIGN tok_INTEGER {$$ = new TreeNode(lineno, NODE_OP); $$->optype = OP_ASSIGN; $$->addChild($1); $$->addChild($3);}
-| constArrayIdentifier tok_ASSIGN tok_LBRACKET ArrayInitVal tok_RBRACKET {$$ = new TreeNode(lineno, NODE_OP); $$->optype = OP_ASSIGN; $$->addChild($1); $$->addChild($4);}
-;
+ConstExps
+    : '[' ConstExp ']'                              { $$ = newConstExps($2, NULL); }
+    | '[' ConstExp ']' ConstExps                    { $$ = newConstExps($2, $4); }
+    ;
+
+ConstInitVal
+    : ConstExp                                      { $$ = newConstInitVal($1); }
+    | '{''}'    									{ $$ = newConstInitVal(NULL); }
+    | '{'  ConstInitVals '}'    					{ $$ = newConstInitVal($2); }
+    ;
+
+ConstInitVals
+    : ConstInitVal                                  { $$ = newConstInitVals($1,NULL); }
+    | ConstInitVals ','   ConstInitVal              { $$ = newConstInitVals($3,$1); }
+    ;
+
+VarDecl
+    : INT VarDefs  ';'                        		{ $$ = $2; }
+    ;
+VarDefs
+    : VarDef                                        { $$ = newVarDefs($1,NULL); }
+    | VarDefs ',' VarDef                            { $$ = newVarDefs($3,$1); }
+    ;
+VarDef
+    : Ident                                         { $$ = newVarDef(0, $1, NULL, NULL); }
+    | Ident ASSIGN InitVal                        	{ $$ = newVarDef(1, $1, NULL, $3); }
+    | Ident ConstExps                               { $$ = newVarDef(2, $1, $2, NULL); }
+    | Ident ConstExps ASSIGN InitVal                { $$ = newVarDef(3, $1, $2, $4); }
+    ;
+
+InitVal
+    : Exp                                           { $$ = newInitVal($1); }
+    | '{' '}'        								{ $$ = NULL; }
+    | '{' InitVals '}'        				        { $$ = newInitVal($2); }
+    ;
+
+InitVals
+    : InitVal                                       { $$ = newInitVals($1,NULL);}
+    | InitVals ',' InitVal                          { $$ = newInitVals($3,$1);}
+    ;
+
+FuncDef
+    : INT Declarator Block                    	    { $$ = newFuncDef(0, $2, $3); }
+    | VOID Declarator Block                		    { $$ = newFuncDef(1, $2, $3); }
+    ;
+
+Declarator
+    : Ident '(' FuncFParams ')'                     { $$ = newDeclarator($1, $3); }
+    | Ident '(' ')'                                 { $$ = newDeclarator($1, NULL); }
+    | Ident                                         { $$ = newDeclarator($1,NULL); }
+    ;
+
+FuncFParams
+    : FuncFParam                                	{ $$ = newFuncFParams($1, NULL); }
+    | FuncFParams ',' FuncFParam                    { $$ = newFuncFParams($3, $1); }
+    ;
+
+
+FuncFParam
+    : INT Ident                                     { $$ = newFuncFParam(0, $2, NULL); }
+    | INT Ident '[' ']'                 			{ $$ = newFuncFParam(1, $2, NULL); }
+    | INT Ident Exps                                { $$ = newFuncFParam(2, $2, $3); }
+    | INT Ident '[' ']' Exps             			{ $$ = newFuncFParam(3, $2, $5); }
+    ;
+
+Block    
+	: '{' BlockItems '}'               				{ $$ = newBlock($2); }
+    ;
+
+BlockItems
+    : BlockItem                                     { $$ = newBlockItems($1, NULL); }
+    | BlockItems BlockItem                          { $$ = newBlockItems($2, $1); }
+    ;
+
+BlockItem
+    : Decl                                          { $$ = $1; }
+    | Stmt                                          { $$ = $1; }
+    ;
+
+Stmt
+    : LValStat                    	                { $$ = $1; } 
+    | Block                                         { $$ = $1; }
+    | ExpressionStat                                { $$ = $1; }
+    | IterationStat                	                { $$ = $1; }
+    | SelectionStat                                 { $$ = $1; }
+    | ReturnStat                                    { $$ = $1; }
+    | BreakStat                            		    { $$ = $1; }
+    | ContinueStat                           	    { $$ = $1; }
+    ;
+
+SelectionStat  
+    : IF '(' EqExp ')' Stmt ElseStat                { $$ = ifStmt($3, $5, $6); }
+    | IF '(' EqExp ')' Stmt                         { $$ = ifStmt($3, $5, NULL); }
+    ;
+ElseStat
+    : ELSE Stmt                                     { $$ = $2; }
+    ;
+LValStat
+    : LVal ASSIGN Exp ';'                    	    { $$ = lvalStmt($1,$3); }
+    ;
+ExpressionStat
+    : ';'                                           { $$ = exprStmt(NULL); }
+    | Exp ';'                                       { $$ = exprStmt($1); }
+    ;
+
+IterationStat
+    : WHILE '(' EqExp ')' Stmt                      { $$ = whileStmt($3, $5); }
+    ;
+
+ReturnStat
+    : RETURN Exp ';'                        	    { $$ = returnStmt($2); }
+    | RETURN ';'                            	    { $$ = returnStmt(NULL); }
+    ;
+BreakStat
+    : BREAK ';'                        	            { $$ = breakStmt(); }
+    ;
+ContinueStat
+    : CONTINUE ';'                        	        { $$ = continueStmt(); }
+    ;
+Exp
+    : AddExp                               		    { $$ = $1; }
+    ; 
+
+LVal
+    : Ident                                		    { $$ = newLval($1, NULL); }
+    | Ident Exps                            	    { $$ = newLval($1, $2); }
+    ;
+
+Exps
+    : '[' Exp ']'                				    { $$ = newExps($2, NULL); }
+    | '[' Exp ']' Exps           				    { $$ = newExps($2, $4); }
+    ;
+
+PrimaryExp
+    : '(' Exp ')'                     			    { $$ = $2; }
+    | LVal                                 		    { $$ = $1; }
+    | Number                            		    { $$ = $1; }
+    ;
+
+Number
+    : NUMBER                            		    { $$ = newNumber($1); }
+    ;
+
+UnaryExp
+    : PrimaryExp                             	    { $$ = $1; }
+    | Ident '(' ')'               				    { $$ = newUnaryExp(-1, $1, NULL); }
+    | Ident '(' FuncRParams ')'    				    { $$ = newUnaryExp(-1, $1, $3); }
+    | '+' UnaryExp                    			    { $$ = newUnaryExp('+', $2, NULL); }
+    | '-' UnaryExp                    			    { $$ = newUnaryExp('-', $2, NULL); }
+    | '!' UnaryExp                    			    { $$ = newUnaryExp('!', $2, NULL); }
+    ;
+
+
+FuncRParams
+    : Exp                            			    { $$ = newFuncRParams($1, NULL); }
+    | FuncRParams ',' Exp                      	    { $$ = newFuncRParams($3, $1); }
+    ;
+
+
+MulExp
+    : UnaryExp                     				    { $$ = $1; } 
+    | MulExp '*' UnaryExp        				    { $$ = newExpr('*', $1, $3); } 
+    | MulExp '/' UnaryExp        				    { $$ = newExpr('/', $1, $3); } 
+    | MulExp '%' UnaryExp        				    { $$ = newExpr('%', $1, $3); } 
+    ;
+
+AddExp
+    : MulExp                         			    { $$ = $1; } 
+    | MulExp '+' AddExp        					    { $$ = newExpr('+', $1, $3); } 
+    | MulExp '-' AddExp         				    { $$ = newExpr('-', $1, $3); } 
+    ;
+
+EqExp
+    : AddExp                         			    { $$ = $1; } 
+    | EqExp CMP AddExp            				    { $$ = newExpr($2, $1, $3); }  
+    ;
+
+ConstExp
+    : AddExp                        			    { $$ = $1; } 
+    ;
+
+Ident
+    : IDentifier                   				    { $$ = newString($1); }
+    ;
 
 %%

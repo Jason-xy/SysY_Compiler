@@ -110,9 +110,8 @@ void genFuncDef(Ast *root)
             length = strlen(tmp);
         }
         tmp[length - 1] = 0;
-        sprintf(buffer, "define %s @%s(%s) #0 {", 
-            funcType->message[0] == 'i' ? "i32" : "void"
-            , funcName->message, tmp);
+        sprintf(buffer, "define %s @%s(%s) #0 {",
+                funcType->message[0] == 'i' ? "i32" : "void", funcName->message, tmp);
         printLine();
         scope++;
 
@@ -125,9 +124,8 @@ void genFuncDef(Ast *root)
     else
     {
         block = funcName->sibling;
-        sprintf(buffer, "define %s @%s() #0 {", 
-            funcType->message[0] == 'i' ? "i32" : "void"
-            , funcName->message);
+        sprintf(buffer, "define %s @%s() #0 {",
+                funcType->message[0] == 'i' ? "i32" : "void", funcName->message);
         printLine();
         scope++;
 
@@ -358,7 +356,7 @@ int genFuncCall(Ast *root)
     Ast *params = funcName->sibling;
     char tmp[50] = {0};
     int length = 0;
-    if (params != NULL) 
+    if (params != NULL)
     {
         for (Ast *param = params->child; param != NULL; param = param->sibling)
         {

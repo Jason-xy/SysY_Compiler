@@ -1,97 +1,66 @@
 %{
-#include <stdio.h>
-#include "tok.h"
-char* yyID;
-int yyNUM;
+#include <stdlib.h>
+#include "ast.h"
+#include "y.tab.h"
+
+
+void yyerror(char const* msg, ...);
+int lineno = 1;
+
+
+
 %}
 
-WHITE [\t\n ]
-DIGIT [0-9]
-OINTEGER [1-9]{DIGIT}*
-INTEGER 0|{OINTEGER}
-
-LETTER [a-zA-Z]
-ID ({LETTER}|_)({LETTER}|_|{DIGIT})*
-
+DEX [1-9][0-9]*|[0]
+HEX [0][Xx]([1-9][0-9a-fA-F]*|[0])
+OCT [0][0-7]*
+ID              [a-zA-Z_][a-zA-Z_0-9]*
 
 %%
-{WHITE}+      ;
-\/\*(\s|.)*?\*\/ { /* ignore note */ }
-\/\/.* { /* ignore note */ }
-{INTEGER}     {yyNUM = atoi(yytext); return tok_INTEGER;}
-(int)         {return tok_INT;}
-(void)        {return tok_RETURN;}
-(const)       {return tok_CONST;}
-(if)          {return tok_IF;}
-(else)        {return tok_ELSE;}
-(while)       {return tok_WHILE;}
-(break)       {return tok_BREAK;}
-(continue)    {return tok_CONTINUE;}
-(return)      {return tok_RETURN;}
-{ID}          {yyID = yytext; return tok_ID;}
-"+"           {return tok_ADD;}
-"-"           {return tok_SUB;}
-"*"           {return tok_MUL;}
-"/"           {return tok_DIV;}
-"%"           {return tok_MODULO;}
-"<"           {return tok_LESS;}
-"<="          {return tok_LESSEQ;}
-">"           {return tok_GREAT;}
-">="          {return tok_GREATEQ;}
-"!="          {return tok_NOTEQ;}
-"=="          {return tok_EQ;}
-"!"           {return tok_NOT;}
-"&&"          {return tok_AND;}
-"||"          {return tok_OR;}
-"="           {return tok_ASSIGN;}
-"("           {return tok_LPAR;}
-")"           {return tok_RPAR;}
-"{"           {return tok_LBRACKET;}
-"}"           {return tok_RBRACKET;}
-"["           {return tok_LSQUARE;}
-"]"           {return tok_RSQUARE;}
-","           {return tok_COMMA;}
-";"           {return tok_SEMICOLON;}
 
-.          	  { printf("Mystery character %c\n", *yytext); }
+"/*"([^\*]|(\*)+[^/])*"*/"				{  }
+"//".*				{  }
+
+int					{ yylval.iValue = tok_INT; return INT;}
+const				{ yylval.iValue = tok_CONST; return CONST;}
+void				{ yylval.iValue = tok_VOID; return VOID;}
+if					{ return IF;}
+else				{ return ELSE;}
+while				{ return WHILE;}
+break				{ return BREAK;}
+continue			{ return CONTINUE;}
+return				{ return RETURN;}
+
+"+"|"-"|"*"|"/"|"%"|"&"|""|"!"      { return yytext[0]; }
+"{"|"}"|"["|"]"         			{ return yytext[0]; }
+","|";"                 			{ return yytext[0]; }
+"("|")"                 			{ return yytext[0]; }
+
+"<"					{ yylval.iValue = tok_LESS; return CMP;}
+">"					{ yylval.iValue = tok_GREAT; return CMP;}
+"<="				{ yylval.iValue = tok_LESSEQ; return CMP;}
+">="				{ yylval.iValue = tok_GREATEQ; return CMP;}
+"=="				{ yylval.iValue = tok_EQ; return CMP;}
+"!="				{ yylval.iValue = tok_NOTEQ; return CMP;}
+"&&"				{ yylval.iValue = tok_AND; return CMP;}
+"||"				{ yylval.iValue = tok_OR; return CMP;}
+
+"="					{ yylval.iValue = tok_ASSIGN; return ASSIGN;}
+
+\n					{ ++lineno; }
+[ \t]				{  }
+{DEX} 				{ yylval.iValue = atoi(yytext); return NUMBER;}
+{HEX} 				{ yylval.iValue = strtol(yytext, NULL, 16); return NUMBER;}
+{OCT} 				{ yylval.iValue = strtol(yytext, NULL, 8); return NUMBER;}
+{ID}				{ yylval.eValue = strdup(yytext); return IDentifier;}
+
+.                   { yyerror("line:%d unknown character %s", lineno, yytext); }
 %%
 
-// int main(int arg,char **argv) {
-//     int tok;
-// 	if(arg>1){
-//         if(!(yyin=fopen(argv[1],"r"))){
-//             perror(argv[1]);
-//             return 1;
-//         }
-//     }
-    
-//     while(tok = yylex()){
-//         if(tok == tok_ID)
-//             printf("%d %s\n", tok_ID,yyID);
-//         else if(tok == tok_INTEGER) 
-//             printf("%d %d\n", tok_INTEGER,yyNUM);
-//         else 
-//             printf("%d\n",tok);
-//     }
-// }
-
-int yyerror(char *s)
-{
-	fprintf(stderr, "error: %s\n", s);
-	return 0;
-}
-
-int yywrap()
+int yywrap(void)
 {
 	return 1;
 }
 
-void yyputback(char* yytext)
-{
-	char *tmpStr = strdup(yytext);
-	int len = strlen(tmpStr);
-	for(int i = len - 1; i >= 0; i--){
-		unput(tmpStr[i]);
-	}
-	unput(' ');
-}
+
+

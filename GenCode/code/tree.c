@@ -10,7 +10,7 @@ Ast *createNode(int lineno, NodeType type, const char *msg)
     return ret;
 }
 
-void addChild(Ast *root, Ast *node) 
+void addChild(Ast *root, Ast *node)
 {
     if (root->child == NULL)
         root->child = node;
@@ -40,4 +40,3 @@ void rprintAst(const Ast *root, int height, FILE *fp)
     rprintAst(root->child, height + 1, fp);
     rprintAst(root->sibling, height, fp);
 }
-
