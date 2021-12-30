@@ -1,0 +1,58 @@
+
+define i32 @main() #0 {
+  %temp = alloca i32, align 4
+  %i = alloca i32, align 4
+  %count = alloca i32, align 4
+  %1 = i32 0, align 4
+  store i32 %1, i32 * %count, align 4
+  %2 = i32 0, align 4
+  store i32 %2, i32 * %i, align 4
+  %3 = i32 0, align 4
+  store i32 %3, i32 * %temp, align 4
+
+;<label>: 4
+  %7 = load i32 * %temp, align 4
+  %8 = i32 10, align 4
+  %9 = icmp sne i32 %7, %8
+  br i1 %9, label %5, label %6
+
+;<label>: 5
+  %10 = call i32 @getch()
+  store i32 %10, i32 * %temp, align 4
+  %11 = load i32 * %temp, align 4
+  %12 = i32 40, align 4
+  %13 = icmp sgt i32 %11, %12
+  %14 = load i32 * %temp, align 4
+  %15 = i32 91, align 4
+  %16 = icmp slt i32 %14, %15
+  %17 = icmp and i32 %13, %16
+  %18 = load i32 * %temp, align 4
+  %19 = i32 96, align 4
+  %20 = icmp sgt i32 %18, %19
+  %21 = load i32 * %temp, align 4
+  %22 = i32 123, align 4
+  %23 = icmp slt i32 %21, %22
+  %24 = icmp and i32 %20, %23
+  %25 = icmp sor i32 %17, %24
+  br i1 %25, label %26, label %27
+
+;<label>: 26
+  %28 = load i32 * %count, align 4
+  %29 = i32 1, align 4
+  %30 = add nsw i32 %28, %29
+  store i32 %30, i32 * %count, align 4
+  br label %27
+
+;<label>: 27
+  %31 = load i32 * %i, align 4
+  %32 = i32 1, align 4
+  %33 = add nsw i32 %31, %32
+  store i32 %33, i32 * %i, align 4
+  br label %4
+
+;<label>: 6
+  %34 = load i32 * %count, align 4
+  %35 = call i32 @putint(i32 %34)
+  %36 = i32 0, align 4
+  ret i32 %36
+}

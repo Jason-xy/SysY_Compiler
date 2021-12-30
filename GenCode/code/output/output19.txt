@@ -1,0 +1,23 @@
+@a = global i32, align 4
+@b = global i32, align 4
+@c = global i32, align 4
+
+define void @add(i32 %a,i32 %b) #0 {
+  %1 = load i32 * %a, align 4
+  %2 = load i32 * %b, align 4
+  %3 = add nsw i32 %1, %2
+  store i32 %3, i32 * %c, align 4
+  ret
+}
+
+define i32 @main() #0 {
+  %4 = i32 3, align 4
+  store i32 %4, i32 * %a, align 4
+  %5 = i32 2, align 4
+  store i32 %5, i32 * %b, align 4
+  %6 = load i32 * %a, align 4
+  %7 = load i32 * %b, align 4
+  %8 = call i32 @add(i32 %6,i32 %7)
+  %9 = load i32 * %c, align 4
+  ret i32 %9
+}

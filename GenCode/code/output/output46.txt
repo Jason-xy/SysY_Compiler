@@ -1,0 +1,4 @@
+@g = global i32, align 4
+@h = global i32, align 4
+@f = global i32, align 4
+@e = global i32, align 4

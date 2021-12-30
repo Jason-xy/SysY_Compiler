@@ -1,0 +1,46 @@
+
+define i32 @fib(i32 %n) #0 {
+  %1 = load i32 * %n, align 4
+  %2 = i32 0, align 4
+  %3 = icmp seq i32 %1, %2
+  br i1 %3, label %4, label %5
+
+;<label>: 4
+  br label %5
+
+;<label>: 5
+  %6 = load i32 * %n, align 4
+  %7 = i32 1, align 4
+  %8 = icmp seq i32 %6, %7
+  br i1 %8, label %9, label %10
+
+;<label>: 9
+  br label %10
+
+;<label>: 10
+  %p = alloca i32, align 4
+  %11 = load i32 * %n, align 4
+  %12 = i32 1, align 4
+  %13 = sub nsw i32 %11, %12
+  store i32 %13, i32 * %p, align 4
+  %q = alloca i32, align 4
+  %14 = load i32 * %n, align 4
+  %15 = i32 2, align 4
+  %16 = sub nsw i32 %14, %15
+  store i32 %16, i32 * %q, align 4
+  %17 = load i32 * %p, align 4
+  %18 = call i32 @fib(i32 %17)
+  %19 = load i32 * %q, align 4
+  %20 = call i32 @fib(i32 %19)
+  %21 = add nsw i32 %18, %20
+  ret i32 %21
+}
+
+define i32 @main() #0 {
+  %tmp = alloca i32, align 4
+  %22 = i32 10, align 4
+  store i32 %22, i32 * %tmp, align 4
+  %23 = load i32 * %tmp, align 4
+  %24 = call i32 @fib(i32 %23)
+  ret i32 %24
+}

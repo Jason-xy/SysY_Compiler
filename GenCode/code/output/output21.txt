@@ -1,0 +1,22 @@
+@a = global i32, align 4
+
+define i32 @main() #0 {
+  %1 = i32 10, align 4
+  store i32 %1, i32 * %a, align 4
+  %2 = load i32 * %a, align 4
+  %3 = i32 0, align 4
+  %4 = icmp sgt i32 %2, %3
+  br i1 %4, label %5, label %6
+
+;<label>: 5
+  %7 = i32 1, align 4
+  ret i32 %7
+  br label %8
+
+;<label>: 6
+  %9 = i32 0, align 4
+  ret i32 %9
+  br label %8
+
+;<label>: 8
+}

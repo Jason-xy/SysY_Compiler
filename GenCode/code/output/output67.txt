@@ -1,0 +1,36 @@
+@a = global i32, align 4
+@r = global i32, align 4
+
+define i32 @fac(i32 %x) #0 {
+  %1 = load i32 * %x, align 4
+  %2 = i32 2, align 4
+  %3 = icmp slt i32 %1, %2
+  br i1 %3, label %4, label %5
+
+;<label>: 4
+  br label %5
+
+;<label>: 5
+  %6 = load i32 * %x, align 4
+  %7 = i32 1, align 4
+  %8 = sub nsw i32 %6, %7
+  store i32 %8, i32 * %a, align 4
+  %9 = load i32 * %a, align 4
+  %10 = call i32 @fac(i32 %9)
+  store i32 %10, i32 * %r, align 4
+  %11 = load i32 * %x, align 4
+  %12 = load i32 * %r, align 4
+  %13 = mul nsw i32 %11, %12
+  store i32 %13, i32 * %r, align 4
+  %14 = load i32 * %r, align 4
+  ret i32 %14
+}
+
+define i32 @main() #0 {
+  %a = alloca i32, align 4
+  %15 = i32 5, align 4
+  store i32 %15, i32 * %a, align 4
+  %16 = load i32 * %a, align 4
+  %17 = call i32 @fac(i32 %16)
+  ret i32 %17
+}

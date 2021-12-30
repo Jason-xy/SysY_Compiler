@@ -1,0 +1,67 @@
+
+define i32 @main() #0 {
+  %i = alloca i32, align 4
+  %j = alloca i32, align 4
+  %k = alloca i32, align 4
+  %1 = i32 0, align 4
+  store i32 %1, i32 * %i, align 4
+  %2 = i32 0, align 4
+  store i32 %2, i32 * %j, align 4
+  %3 = i32 0, align 4
+  store i32 %3, i32 * %k, align 4
+  %cnt = alloca i32, align 4
+  store i32 0, i32 * %cnt, align 4
+
+;<label>: 4
+  %7 = load i32 * %i, align 4
+  %8 = i32 3, align 4
+  %9 = icmp slt i32 %7, %8
+  br i1 %9, label %5, label %6
+
+;<label>: 5
+
+;<label>: 10
+  %13 = load i32 * %j, align 4
+  %14 = i32 3, align 4
+  %15 = icmp slt i32 %13, %14
+  br i1 %15, label %11, label %12
+
+;<label>: 11
+
+;<label>: 16
+  %19 = load i32 * %k, align 4
+  %20 = i32 3, align 4
+  %21 = icmp slt i32 %19, %20
+  br i1 %21, label %17, label %18
+
+;<label>: 17
+  %22 = load i32 * %cnt, align 4
+  store i32 %22, i32 * %[], align 4
+  %23 = load i32 * %cnt, align 4
+  %24 = i32 1, align 4
+  %25 = add nsw i32 %23, %24
+  store i32 %25, i32 * %cnt, align 4
+  %26 = load i32 * %k, align 4
+  %27 = i32 1, align 4
+  %28 = add nsw i32 %26, %27
+  store i32 %28, i32 * %k, align 4
+  br label %16
+
+;<label>: 18
+  %29 = load i32 * %j, align 4
+  %30 = i32 1, align 4
+  %31 = add nsw i32 %29, %30
+  store i32 %31, i32 * %j, align 4
+  br label %10
+
+;<label>: 12
+  %32 = load i32 * %i, align 4
+  %33 = i32 1, align 4
+  %34 = add nsw i32 %32, %33
+  store i32 %34, i32 * %i, align 4
+  br label %4
+
+;<label>: 6
+  %35 = i32 0, align 4
+  ret i32 %35
+}

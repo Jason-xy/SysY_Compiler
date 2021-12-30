@@ -1,0 +1,2 @@
+@N = global i32, align 4
+@newline = global i32, align 4

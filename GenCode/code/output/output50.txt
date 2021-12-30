@@ -1,0 +1,40 @@
+@a = global i32, align 4
+
+define i32 @myFunc(i32 %a,i32 %b,i32 %c) #0 {
+  %1 = i32 2, align 4
+  store i32 %1, i32 * %a, align 4
+
+;<label>: 2
+  %5 = load i32 * %b, align 4
+  %6 = i32 0, align 4
+  %7 = icmp sgt i32 %5, %6
+  br i1 %7, label %3, label %4
+
+;<label>: 3
+  %8 = load i32 * %b, align 4
+  %9 = i32 1, align 4
+  %10 = sub nsw i32 %8, %9
+  store i32 %10, i32 * %b, align 4
+  br label %2
+
+;<label>: 4
+  %11 = load i32 * %a, align 4
+  %12 = load i32 * %b, align 4
+  %13 = add nsw i32 %11, %12
+  ret i32 %13
+}
+
+define i32 @main() #0 {
+  %14 = i32 3, align 4
+  store i32 %14, i32 * %a, align 4
+  %b = alloca i32, align 4
+  %15 = i32 1, align 4
+  %16 = i32 2, align 4
+  %17 = i32 1, align 4
+  %18 = call i32 @myFunc(i32 %15,i32 %16,i32 %17)
+  store i32 %18, i32 * %b, align 4
+  %19 = load i32 * %a, align 4
+  %20 = load i32 * %b, align 4
+  %21 = add nsw i32 %19, %20
+  ret i32 %21
+}

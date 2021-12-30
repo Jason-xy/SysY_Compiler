@@ -1,0 +1,242 @@
+@n = global i32, align 4
+
+define i32 @main() #0 {
+  %a0 = alloca i32, align 4
+  %a1 = alloca i32, align 4
+  %a2 = alloca i32, align 4
+  %a3 = alloca i32, align 4
+  %a4 = alloca i32, align 4
+  %a5 = alloca i32, align 4
+  %a6 = alloca i32, align 4
+  %a7 = alloca i32, align 4
+  %a8 = alloca i32, align 4
+  %a9 = alloca i32, align 4
+  %a10 = alloca i32, align 4
+  %a11 = alloca i32, align 4
+  %a12 = alloca i32, align 4
+  %a13 = alloca i32, align 4
+  %a14 = alloca i32, align 4
+  %a15 = alloca i32, align 4
+  %a16 = alloca i32, align 4
+  %a17 = alloca i32, align 4
+  %a18 = alloca i32, align 4
+  %a19 = alloca i32, align 4
+  %a20 = alloca i32, align 4
+  %a21 = alloca i32, align 4
+  %a22 = alloca i32, align 4
+  %a23 = alloca i32, align 4
+  %a24 = alloca i32, align 4
+  %a25 = alloca i32, align 4
+  %a26 = alloca i32, align 4
+  %a27 = alloca i32, align 4
+  %a28 = alloca i32, align 4
+  %a29 = alloca i32, align 4
+  %b = alloca i32, align 4
+  %1 = call i32 @getint()
+  store i32 %1, i32 * %b, align 4
+
+;<label>: 2
+  %5 = load i32 * %b, align 4
+  %6 = i32 5, align 4
+  %7 = icmp seq i32 %5, %6
+  br i1 %7, label %3, label %4
+
+;<label>: 3
+  %8 = load i32 * %b, align 4
+  %9 = i32 1, align 4
+  %10 = add nsw i32 %8, %9
+  store i32 %10, i32 * %b, align 4
+  br label %2
+
+;<label>: 4
+  %11 = i32 0, align 4
+  store i32 %11, i32 * %a0, align 4
+  %12 = load i32 * %a0, align 4
+  %13 = i32 1, align 4
+  %14 = add nsw i32 %12, %13
+  store i32 %14, i32 * %a1, align 4
+  %15 = load i32 * %a1, align 4
+  %16 = i32 1, align 4
+  %17 = add nsw i32 %15, %16
+  store i32 %17, i32 * %a2, align 4
+  %18 = load i32 * %a2, align 4
+  %19 = i32 1, align 4
+  %20 = add nsw i32 %18, %19
+  store i32 %20, i32 * %a3, align 4
+  %21 = load i32 * %a3, align 4
+  %22 = i32 1, align 4
+  %23 = add nsw i32 %21, %22
+  store i32 %23, i32 * %a4, align 4
+  %24 = load i32 * %a4, align 4
+  %25 = i32 1, align 4
+  %26 = add nsw i32 %24, %25
+  store i32 %26, i32 * %a5, align 4
+  %27 = load i32 * %a5, align 4
+  %28 = i32 1, align 4
+  %29 = add nsw i32 %27, %28
+  store i32 %29, i32 * %a6, align 4
+  %30 = load i32 * %a6, align 4
+  %31 = i32 1, align 4
+  %32 = add nsw i32 %30, %31
+  store i32 %32, i32 * %a7, align 4
+  %33 = load i32 * %a7, align 4
+  %34 = i32 1, align 4
+  %35 = add nsw i32 %33, %34
+  store i32 %35, i32 * %a8, align 4
+  %36 = load i32 * %a8, align 4
+  %37 = i32 1, align 4
+  %38 = add nsw i32 %36, %37
+  store i32 %38, i32 * %a9, align 4
+  %39 = load i32 * %a9, align 4
+  %40 = i32 1, align 4
+  %41 = add nsw i32 %39, %40
+  store i32 %41, i32 * %a10, align 4
+  %42 = load i32 * %a10, align 4
+  %43 = i32 1, align 4
+  %44 = add nsw i32 %42, %43
+  store i32 %44, i32 * %a11, align 4
+  %45 = load i32 * %a11, align 4
+  %46 = i32 1, align 4
+  %47 = add nsw i32 %45, %46
+  store i32 %47, i32 * %a12, align 4
+  %48 = load i32 * %a12, align 4
+  %49 = i32 1, align 4
+  %50 = add nsw i32 %48, %49
+  store i32 %50, i32 * %a13, align 4
+  %51 = load i32 * %a13, align 4
+  %52 = i32 1, align 4
+  %53 = add nsw i32 %51, %52
+  store i32 %53, i32 * %a14, align 4
+  %54 = load i32 * %a14, align 4
+  %55 = i32 1, align 4
+  %56 = add nsw i32 %54, %55
+  store i32 %56, i32 * %a15, align 4
+  %57 = load i32 * %a15, align 4
+  %58 = i32 1, align 4
+  %59 = add nsw i32 %57, %58
+  store i32 %59, i32 * %a16, align 4
+  %60 = load i32 * %a16, align 4
+  %61 = i32 1, align 4
+  %62 = add nsw i32 %60, %61
+  store i32 %62, i32 * %a17, align 4
+  %63 = load i32 * %a17, align 4
+  %64 = i32 1, align 4
+  %65 = add nsw i32 %63, %64
+  store i32 %65, i32 * %a18, align 4
+  %66 = load i32 * %a18, align 4
+  %67 = i32 1, align 4
+  %68 = add nsw i32 %66, %67
+  store i32 %68, i32 * %a19, align 4
+  %69 = load i32 * %a19, align 4
+  %70 = i32 1, align 4
+  %71 = add nsw i32 %69, %70
+  store i32 %71, i32 * %a20, align 4
+  %72 = load i32 * %a20, align 4
+  %73 = i32 1, align 4
+  %74 = add nsw i32 %72, %73
+  store i32 %74, i32 * %a21, align 4
+  %75 = load i32 * %a21, align 4
+  %76 = i32 1, align 4
+  %77 = add nsw i32 %75, %76
+  store i32 %77, i32 * %a22, align 4
+  %78 = load i32 * %a22, align 4
+  %79 = i32 1, align 4
+  %80 = add nsw i32 %78, %79
+  store i32 %80, i32 * %a23, align 4
+  %81 = load i32 * %a23, align 4
+  %82 = i32 1, align 4
+  %83 = add nsw i32 %81, %82
+  store i32 %83, i32 * %a24, align 4
+  %84 = load i32 * %a24, align 4
+  %85 = i32 1, align 4
+  %86 = add nsw i32 %84, %85
+  store i32 %86, i32 * %a25, align 4
+  %87 = load i32 * %a25, align 4
+  %88 = i32 1, align 4
+  %89 = add nsw i32 %87, %88
+  store i32 %89, i32 * %a26, align 4
+  %90 = load i32 * %a26, align 4
+  %91 = i32 1, align 4
+  %92 = add nsw i32 %90, %91
+  store i32 %92, i32 * %a27, align 4
+  %93 = load i32 * %a27, align 4
+  %94 = i32 1, align 4
+  %95 = add nsw i32 %93, %94
+  store i32 %95, i32 * %a28, align 4
+  %96 = load i32 * %a28, align 4
+  %97 = i32 1, align 4
+  %98 = add nsw i32 %96, %97
+  store i32 %98, i32 * %a29, align 4
+  %t = alloca i32, align 4
+  %99 = load i32 * %a0, align 4
+  %100 = call i32 @putint(i32 %99)
+  %101 = load i32 * %a1, align 4
+  %102 = call i32 @putint(i32 %101)
+  %103 = load i32 * %a2, align 4
+  %104 = call i32 @putint(i32 %103)
+  %105 = load i32 * %a3, align 4
+  %106 = call i32 @putint(i32 %105)
+  %107 = load i32 * %a4, align 4
+  %108 = call i32 @putint(i32 %107)
+  %109 = load i32 * %a5, align 4
+  %110 = call i32 @putint(i32 %109)
+  %111 = load i32 * %a6, align 4
+  %112 = call i32 @putint(i32 %111)
+  %113 = load i32 * %a7, align 4
+  %114 = call i32 @putint(i32 %113)
+  %115 = load i32 * %a8, align 4
+  %116 = call i32 @putint(i32 %115)
+  %117 = load i32 * %a9, align 4
+  %118 = call i32 @putint(i32 %117)
+  %119 = load i32 * %a10, align 4
+  %120 = call i32 @putint(i32 %119)
+  %121 = load i32 * %a11, align 4
+  %122 = call i32 @putint(i32 %121)
+  %123 = load i32 * %a12, align 4
+  %124 = call i32 @putint(i32 %123)
+  %125 = load i32 * %a13, align 4
+  %126 = call i32 @putint(i32 %125)
+  %127 = load i32 * %a14, align 4
+  %128 = call i32 @putint(i32 %127)
+  %129 = load i32 * %a15, align 4
+  %130 = call i32 @putint(i32 %129)
+  %131 = load i32 * %a16, align 4
+  %132 = call i32 @putint(i32 %131)
+  %133 = load i32 * %a17, align 4
+  %134 = call i32 @putint(i32 %133)
+  %135 = load i32 * %a18, align 4
+  %136 = call i32 @putint(i32 %135)
+  %137 = load i32 * %a19, align 4
+  %138 = call i32 @putint(i32 %137)
+  %139 = load i32 * %a20, align 4
+  %140 = call i32 @putint(i32 %139)
+  %141 = load i32 * %a21, align 4
+  %142 = call i32 @putint(i32 %141)
+  %143 = load i32 * %a22, align 4
+  %144 = call i32 @putint(i32 %143)
+  %145 = load i32 * %a23, align 4
+  %146 = call i32 @putint(i32 %145)
+  %147 = load i32 * %a24, align 4
+  %148 = call i32 @putint(i32 %147)
+  %149 = load i32 * %a25, align 4
+  %150 = call i32 @putint(i32 %149)
+  %151 = load i32 * %a26, align 4
+  %152 = call i32 @putint(i32 %151)
+  %153 = load i32 * %a27, align 4
+  %154 = call i32 @putint(i32 %153)
+  %155 = load i32 * %a28, align 4
+  %156 = call i32 @putint(i32 %155)
+  %157 = load i32 * %a29, align 4
+  %158 = call i32 @putint(i32 %157)
+  %newline = alloca i32, align 4
+  %159 = i32 10, align 4
+  store i32 %159, i32 * %newline, align 4
+  %160 = load i32 * %newline, align 4
+  %161 = call i32 @putch(i32 %160)
+  %162 = load i32 * %b, align 4
+  %163 = call i32 @putint(i32 %162)
+  %164 = load i32 * %newline, align 4
+  %165 = call i32 @putch(i32 %164)
+  %166 = load i32 * %a25, align 4
+  ret i32 %166
+}

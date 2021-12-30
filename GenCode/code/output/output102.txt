@@ -1,0 +1,1 @@
+@N = global i32, align 4

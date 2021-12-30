@@ -1,0 +1,3 @@
+@M = global i32, align 4
+@L = global i32, align 4
+@N = global i32, align 4

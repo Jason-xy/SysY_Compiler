@@ -1,0 +1,32 @@
+
+define i32 @main() #0 {
+  %i = alloca i32, align 4
+  %sum = alloca i32, align 4
+  %1 = i32 0, align 4
+  store i32 %1, i32 * %sum, align 4
+  %2 = i32 0, align 4
+  store i32 %2, i32 * %i, align 4
+
+;<label>: 3
+  %6 = load i32 * %i, align 4
+  %7 = i32 21, align 4
+  %8 = icmp slt i32 %6, %7
+  br i1 %8, label %4, label %5
+
+;<label>: 4
+  %9 = load i32 * %sum, align 4
+  %10 = load i32 * %i, align 4
+  %11 = add nsw i32 %9, %10
+  store i32 %11, i32 * %sum, align 4
+  %12 = load i32 * %i, align 4
+  %13 = i32 1, align 4
+  %14 = add nsw i32 %12, %13
+  store i32 %14, i32 * %i, align 4
+  br label %3
+
+;<label>: 5
+  %15 = load i32 * %sum, align 4
+  %16 = call i32 @putint(i32 %15)
+  %17 = i32 0, align 4
+  ret i32 %17
+}

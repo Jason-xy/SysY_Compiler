@@ -1,0 +1,12 @@
+
+define i32 @defn() #0 {
+  %1 = i32 4, align 4
+  ret i32 %1
+}
+
+define i32 @main() #0 {
+  %a = alloca i32, align 4
+  store i32 0, i32 * %a, align 4
+  %2 = load i32 * %a, align 4
+  ret i32 %2
+}

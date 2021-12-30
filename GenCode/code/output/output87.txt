@@ -1,0 +1,82 @@
+
+define i32 @main() #0 {
+  %i = alloca i32, align 4
+  %j = alloca i32, align 4
+  %k = alloca i32, align 4
+  %t = alloca i32, align 4
+  %1 = i32 0, align 4
+  store i32 %1, i32 * %i, align 4
+  %2 = i32 0, align 4
+  store i32 %2, i32 * %j, align 4
+  %3 = i32 0, align 4
+  store i32 %3, i32 * %k, align 4
+
+;<label>: 4
+  %7 = load i32 * %i, align 4
+  %8 = i32 21, align 4
+  %9 = icmp slt i32 %7, %8
+  br i1 %9, label %5, label %6
+
+;<label>: 5
+
+;<label>: 10
+  %13 = load i32 * %j, align 4
+  %14 = i32 101, align 4
+  %15 = load i32 * %i, align 4
+  %16 = sub nsw i32 %14, %15
+  %17 = icmp slt i32 %13, %16
+  br i1 %17, label %11, label %12
+
+;<label>: 11
+  %18 = i32 100, align 4
+  %19 = load i32 * %i, align 4
+  %20 = sub nsw i32 %18, %19
+  %21 = load i32 * %j, align 4
+  %22 = sub nsw i32 %20, %21
+  store i32 %22, i32 * %k, align 4
+  %23 = i32 5, align 4
+  %24 = load i32 * %i, align 4
+  %25 = mul nsw i32 %23, %24
+  %26 = i32 1, align 4
+  %27 = load i32 * %j, align 4
+  %28 = mul nsw i32 %26, %27
+  %29 = add nsw i32 %25, %28
+  %30 = load i32 * %k, align 4
+  %31 = i32 2, align 4
+  %32 = div nsw i32 %30, %31
+  %33 = add nsw i32 %29, %32
+  %34 = i32 100, align 4
+  %35 = icmp seq i32 %33, %34
+  br i1 %35, label %36, label %37
+
+;<label>: 36
+  %38 = load i32 * %i, align 4
+  %39 = call i32 @putint(i32 %38)
+  %40 = load i32 * %j, align 4
+  %41 = call i32 @putint(i32 %40)
+  %42 = load i32 * %k, align 4
+  %43 = call i32 @putint(i32 %42)
+  %44 = i32 10, align 4
+  store i32 %44, i32 * %t, align 4
+  %45 = load i32 * %t, align 4
+  %46 = call i32 @putch(i32 %45)
+  br label %37
+
+;<label>: 37
+  %47 = load i32 * %j, align 4
+  %48 = i32 1, align 4
+  %49 = add nsw i32 %47, %48
+  store i32 %49, i32 * %j, align 4
+  br label %10
+
+;<label>: 12
+  %50 = load i32 * %i, align 4
+  %51 = i32 1, align 4
+  %52 = add nsw i32 %50, %51
+  store i32 %52, i32 * %i, align 4
+  br label %4
+
+;<label>: 6
+  %53 = i32 0, align 4
+  ret i32 %53
+}

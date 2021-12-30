@@ -1,0 +1,59 @@
+@n = global i32, align 4
+
+define i32 @gcd(i32 %m,i32 %n) #0 {
+  %t = alloca i32, align 4
+  %r = alloca i32, align 4
+  %1 = load i32 * %m, align 4
+  %2 = load i32 * %n, align 4
+  %3 = icmp slt i32 %1, %2
+  br i1 %3, label %4, label %5
+
+;<label>: 4
+  %6 = load i32 * %m, align 4
+  store i32 %6, i32 * %t, align 4
+  %7 = load i32 * %n, align 4
+  store i32 %7, i32 * %m, align 4
+  %8 = load i32 * %t, align 4
+  store i32 %8, i32 * %n, align 4
+  br label %5
+
+;<label>: 5
+  %9 = load i32 * %m, align 4
+  %10 = load i32 * %n, align 4
+  %11 = mod nsw i32 %9, %10
+  store i32 %11, i32 * %r, align 4
+
+;<label>: 12
+  %15 = load i32 * %r, align 4
+  %16 = i32 0, align 4
+  %17 = icmp sne i32 %15, %16
+  br i1 %17, label %13, label %14
+
+;<label>: 13
+  %18 = load i32 * %n, align 4
+  store i32 %18, i32 * %m, align 4
+  %19 = load i32 * %r, align 4
+  store i32 %19, i32 * %n, align 4
+  %20 = load i32 * %m, align 4
+  %21 = load i32 * %n, align 4
+  %22 = mod nsw i32 %20, %21
+  store i32 %22, i32 * %r, align 4
+  br label %12
+
+;<label>: 14
+  %23 = load i32 * %n, align 4
+  ret i32 %23
+}
+
+define i32 @main() #0 {
+  %i = alloca i32, align 4
+  %m = alloca i32, align 4
+  %24 = call i32 @getint()
+  store i32 %24, i32 * %i, align 4
+  %25 = call i32 @getint()
+  store i32 %25, i32 * %m, align 4
+  %26 = load i32 * %i, align 4
+  %27 = load i32 * %m, align 4
+  %28 = call i32 @gcd(i32 %26,i32 %27)
+  ret i32 %28
+}

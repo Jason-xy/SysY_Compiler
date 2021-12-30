@@ -1,0 +1,44 @@
+
+define i32 @main() #0 {
+  %a = alloca i32, align 4
+  %b = alloca i32, align 4
+  %c = alloca i32, align 4
+  %d = alloca i32, align 4
+  %result = alloca i32, align 4
+  %1 = i32 5, align 4
+  store i32 %1, i32 * %a, align 4
+  %2 = i32 5, align 4
+  store i32 %2, i32 * %b, align 4
+  %3 = i32 1, align 4
+  store i32 %3, i32 * %c, align 4
+  %4 = i32 -2, align 4
+  store i32 %4, i32 * %d, align 4
+  %5 = load i32 * %d, align 4
+  %6 = i32 1, align 4
+  %7 = mul nsw i32 %5, %6
+  %8 = i32 2, align 4
+  %9 = div nsw i32 %7, %8
+  %10 = load i32 * %a, align 4
+  %11 = load i32 * %b, align 4
+  %12 = sub nsw i32 %10, %11
+  %13 = add nsw i32 %9, %12
+  %14 = sub nsw i32 %13, %0
+  store i32 %14, i32 * %result, align 4
+  %15 = load i32 * %result, align 4
+  %16 = call i32 @putint(i32 %15)
+  %17 = load i32 * %d, align 4
+  %18 = i32 2, align 4
+  %19 = mod nsw i32 %17, %18
+  %20 = i32 67, align 4
+  %21 = add nsw i32 %19, %20
+  %22 = add nsw i32 %21, %0
+  store i32 %22, i32 * %result, align 4
+  %23 = load i32 * %result, align 4
+  %24 = i32 3, align 4
+  %25 = add nsw i32 %23, %24
+  store i32 %25, i32 * %result, align 4
+  %26 = load i32 * %result, align 4
+  %27 = call i32 @putint(i32 %26)
+  %28 = i32 0, align 4
+  ret i32 %28
+}

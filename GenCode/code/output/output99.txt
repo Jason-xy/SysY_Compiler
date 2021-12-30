@@ -1,0 +1,80 @@
+
+define i32 @palindrome(i32 %n) #0 {
+  %j = alloca i32, align 4
+  %flag = alloca i32, align 4
+  %1 = i32 0, align 4
+  store i32 %1, i32 * %j, align 4
+
+;<label>: 2
+  %5 = load i32 * %j, align 4
+  %6 = i32 4, align 4
+  %7 = icmp slt i32 %5, %6
+  br i1 %7, label %3, label %4
+
+;<label>: 3
+  %8 = load i32 * %n, align 4
+  %9 = i32 10, align 4
+  %10 = mod nsw i32 %8, %9
+  store i32 %10, i32 * %[], align 4
+  %11 = load i32 * %n, align 4
+  %12 = i32 10, align 4
+  %13 = div nsw i32 %11, %12
+  store i32 %13, i32 * %n, align 4
+  %14 = load i32 * %j, align 4
+  %15 = i32 1, align 4
+  %16 = add nsw i32 %14, %15
+  store i32 %16, i32 * %j, align 4
+  br label %2
+
+;<label>: 4
+  %17 = icmp seq i32 %0, %0
+  %18 = icmp seq i32 %0, %0
+  %19 = icmp and i32 %17, %18
+  br i1 %19, label %20, label %21
+
+;<label>: 20
+  %22 = i32 1, align 4
+  store i32 %22, i32 * %flag, align 4
+  br label %23
+
+;<label>: 21
+  %24 = i32 0, align 4
+  store i32 %24, i32 * %flag, align 4
+  br label %23
+
+;<label>: 23
+  %25 = load i32 * %flag, align 4
+  ret i32 %25
+}
+
+define i32 @main() #0 {
+  %test = alloca i32, align 4
+  %26 = i32 1221, align 4
+  store i32 %26, i32 * %test, align 4
+  %flag = alloca i32, align 4
+  %27 = load i32 * %test, align 4
+  %28 = call i32 @palindrome(i32 %27)
+  store i32 %28, i32 * %flag, align 4
+  %29 = load i32 * %flag, align 4
+  %30 = i32 1, align 4
+  %31 = icmp seq i32 %29, %30
+  br i1 %31, label %32, label %33
+
+;<label>: 32
+  br label %34
+
+;<label>: 33
+  %35 = i32 0, align 4
+  store i32 %35, i32 * %flag, align 4
+  %36 = load i32 * %flag, align 4
+  %37 = call i32 @putint(i32 %36)
+  br label %34
+
+;<label>: 34
+  %38 = i32 10, align 4
+  store i32 %38, i32 * %flag, align 4
+  %39 = load i32 * %flag, align 4
+  %40 = call i32 @putch(i32 %39)
+  %41 = i32 0, align 4
+  ret i32 %41
+}
