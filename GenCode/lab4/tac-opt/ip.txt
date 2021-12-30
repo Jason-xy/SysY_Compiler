@@ -1,0 +1,20 @@
+f = a * 2
+i = a / 8
+m = a * 0
+n = a * 1
+goto 10
+t1 = f * i
+f = t1
+t2 = i + 1
+i = t2
+goto 1
+goto 11
+b = 9
+b = c - 0
+b = d + 0
+b = e / 1
+b = 7 - 2
+b = 6 + 1
+b = 6 / 3
+b = 6 * 3
+goto 1
